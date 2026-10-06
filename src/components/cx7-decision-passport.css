@@ -64,3 +64,23 @@
   .cx7-ready-event {grid-template-columns:74px 1fr;}
 }
 @media(prefers-reduced-motion:reduce) {.cx7-ready-hotspot {transition:none;} .cx7-ready-hotspot:hover {transform:none;}}
+/* Inner panels: true metallic gold, stronger module-style contour, subtle glow */
+.cx7-ready-modal {
+  --home-gold: #C9A04E;
+  --home-gold-soft: #D9B465;
+  border: 2px solid transparent;
+  background:
+    linear-gradient(145deg,rgba(16,18,20,.985),rgba(6,7,8,.985)) padding-box,
+    linear-gradient(150deg,#E8C778 0%,#9C7430 22%,#5E4520 40%,rgba(47,174,116,.45) 52%,#5E4520 64%,#A67C34 82%,#E3BE6C 100%) border-box;
+  box-shadow:
+    0 24px 90px rgba(0,0,0,.65),
+    0 0 18px rgba(201,160,78,.14),
+    0 0 6px rgba(47,174,116,.08),
+    inset 0 0 0 4px rgba(6,7,8,.92),
+    inset 0 0 0 5px rgba(201,160,78,.28),
+    inset 0 0 22px rgba(201,160,78,.06),
+    inset 0 0 44px rgba(0,0,0,.5);
+}
+.cx7-ready-subtitle {background:linear-gradient(90deg,#E6C47A,#C9A04E 45%,#B08A3E 70%,#E0BC6E);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.cx7-ready-metric {border:1.5px solid rgba(201,160,78,.38);box-shadow:inset 0 1px 0 rgba(232,199,120,.12),inset 0 0 18px rgba(0,0,0,.4),0 0 10px rgba(201,160,78,.07);}
+.cx7-ready-event {border-bottom-color:rgba(201,160,78,.18);}
