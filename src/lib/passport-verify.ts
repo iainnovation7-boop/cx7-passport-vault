@@ -49,7 +49,7 @@ export function classifyPassport(i: VerifyInput): VerifyResult {
   const okTxs = i.history.filter((h) => h.ok);
   if (okTxs.length >= 2) {
     // history is newest-first; the newest successful tx after creation is the closing one.
-    return { status: "REVOKED", reason: "The attestation was created and later closed on-chain.", evidence: { signature: okTxs[0].signature } };
+    return { status: "REVOKED", reason: "The attestation was created and later closed on-chain.", evidence: { signature: okTxs[0]!.signature } };
   }
   return { status: "NOT_FOUND", reason: okTxs.length === 1 ? "History is inconclusive (single transaction); not treated as revoked." : "No attestation and no on-chain history for this version." };
 }
