@@ -53,7 +53,7 @@ const stages: Stage[] = [
 
 export function LiveScenario() {
   const [step, setStep] = useState(0);
-  const stage = stages[step];
+  const stage = stages[step] ?? stages[0]!;
   const timeline = stages.slice(0, step + 1).flatMap((s) => s.events);
   const last = step === stages.length - 1;
   return (
