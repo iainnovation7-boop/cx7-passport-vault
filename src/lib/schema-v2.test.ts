@@ -12,7 +12,12 @@ process.env["CX7_PSEUDONYMIZATION_KEY"] ||= "test-key-only-for-vitest";
 const AUTH = "BSjrPNLtyBKfh2xW1QLwRDceU2zcnmzqayv3rJpY6i1K";
 const NOW = 1_791_300_000;
 const premise = solUsdPremise({ op: ">=", threshold: 100, maxAgeSec: 300 });
-const schemaData = { layout: Uint8Array.from(SCHEMA_V2_FIELDS.map(([, l]) => l)), fieldNames: SCHEMA_V2_FIELDS.map(([n]) => new TextEncoder().encode(n)) };
+// On-chain Schema representation: fieldNames is a joined vec (u32 LE length + UTF-8 bytes per name).
+const joined = SCHEMA_V2_FIELDS.flatMap(([n]) => {
+  const b = new TextEncoder().encode(n);
+  return [b.length & 255, (b.length >> 8) & 255, 0, 0, ...b];
+});
+const schemaData = { layout: Uint8Array.from(SCHEMA_V2_FIELDS.map(([, l]) => l)), fieldNames: Uint8Array.from(joined) };
 
 describe("Schema V2", () => {
   it("is V2, distinct from V1, and has every required field", () => {
