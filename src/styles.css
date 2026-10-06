@@ -51,7 +51,7 @@
   --popover-foreground: oklch(0.95 0.01 85);
   --gold: oklch(0.8 0.09 82);
   --gold-soft: oklch(0.88 0.05 85);
-  --cyan: oklch(0.82 0.12 205);
+  --cyan: oklch(0.72 0.16 152);
   --primary: var(--gold);
   --primary-foreground: oklch(0.15 0.01 80);
   --secondary: oklch(0.22 0.008 260);
@@ -60,7 +60,7 @@
   --muted-foreground: oklch(0.66 0.015 260);
   --accent: oklch(0.24 0.01 260);
   --accent-foreground: oklch(0.95 0.01 85);
-  --success: oklch(0.8 0.13 175);
+  --success: oklch(0.76 0.15 152);
   --warning: oklch(0.8 0.14 70);
   --danger: oklch(0.66 0.2 25);
   --destructive: var(--danger);
@@ -72,7 +72,7 @@
   --gradient-gold: linear-gradient(135deg, oklch(0.9 0.06 88), oklch(0.74 0.1 75) 55%, oklch(0.62 0.08 65));
   --gradient-hairline: linear-gradient(90deg, transparent, oklch(0.8 0.09 82 / 60%), transparent);
   --shadow-glow: 0 0 60px -10px oklch(0.8 0.09 82 / 25%);
-  --shadow-cyan: 0 0 24px -4px oklch(0.82 0.12 205 / 55%);
+  --shadow-cyan: 0 0 26px -2px oklch(0.58 0.19 152 / 60%);
 }
 
 @layer base {
@@ -83,7 +83,7 @@
     font-family: var(--font-sans);
     background-image:
       radial-gradient(ellipse 80% 50% at 50% -10%, oklch(0.8 0.09 82 / 10%), transparent 60%),
-      radial-gradient(ellipse 50% 40% at 90% 20%, oklch(0.82 0.12 205 / 5%), transparent 60%);
+      radial-gradient(ellipse 50% 40% at 90% 20%, oklch(0.6 0.14 152 / 6%), transparent 60%);
     background-attachment: fixed;
   }
   h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.02em; }
