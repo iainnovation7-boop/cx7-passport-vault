@@ -57,6 +57,7 @@
 .cx7-ready-cta {margin-top:22px;width:100%;height:auto;white-space:normal;border:1px solid var(--home-ring);border-radius:18px;padding:14px 18px;background:var(--home-cta-bg);color:var(--home-cta-text);font-size:16px;text-shadow:0 0 9px rgba(124,231,180,.18);box-shadow:0 0 13px rgba(47,174,116,.07);}
 .cx7-ready-cta:hover {background:var(--home-hover);}
 @media(max-width:640px) {
+  .cx7-approved-home {padding:20px 6px;}
   .cx7-ready-modal {padding:24px 18px 20px;border-radius:22px;}
   .cx7-ready-modal h2 {font-size:30px;}
   .cx7-ready-grid {grid-template-columns:1fr;}
