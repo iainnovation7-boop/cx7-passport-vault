@@ -89,3 +89,9 @@
 .cx7-ready-changed strong {color:var(--home-status);}
 .cx7-ready-reason {margin:14px 0 0;padding:12px 14px;border-left:2px solid var(--home-gold);color:var(--home-text);font-size:14px;line-height:1.5;background:rgba(201,160,78,.05);border-radius:0 12px 12px 0;}
 @media(max-width:640px){.cx7-ready-modal{max-height:calc(100dvh - 24px);padding-bottom:calc(36px + env(safe-area-inset-bottom));}}
+
+/* Origin badges: REAL / VERIFIED vs DEMO / NOT YET ON-CHAIN */
+.cx7-origin {display:inline-block;margin-left:10px;padding:3px 9px;border-radius:999px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;vertical-align:middle;text-shadow:none;}
+.cx7-origin-real {color:var(--home-status);border:1px solid rgba(47,174,116,.55);background:rgba(47,174,116,.08);}
+.cx7-origin-demo {color:var(--home-gold-soft);border:1px dashed rgba(201,160,78,.5);background:rgba(201,160,78,.04);}
+.cx7-real-block {margin-top:20px;padding-top:16px;border-top:1px solid rgba(201,160,78,.22);}
