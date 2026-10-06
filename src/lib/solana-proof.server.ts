@@ -27,6 +27,9 @@ import {
   getCreateCredentialInstruction,
   getCreateSchemaInstruction,
   serializeAttestationData,
+  deserializeAttestationData,
+  getAttestationDecoder,
+  SOLANA_ATTESTATION_SERVICE_PROGRAM_ADDRESS,
 } from "sas-lib";
 import { hashPassport, PROTOCOL_VERSION, scenarioPassports, sha256Bytes, toHex } from "./passport-hash";
 
@@ -71,11 +74,11 @@ export function getRpc() {
 }
 
 /** Builds the exact on-chain payload for the final passport of the Live Scenario. */
-export async function buildOnchainPayload(nowSec: number) {
+export async function buildOnchainPayload(issuedAtSec: number) {
   const pseudoKey = env("CX7_PSEUDONYMIZATION_KEY");
   const { current, previous } = scenarioPassports;
-  // Issuance window: the current UTC day, 24h validity (deterministic within the window).
-  const valid_from = Math.floor(nowSec / DAY) * DAY;
+  // Validity: exactly 24h counted from issuance.
+  const valid_from = Math.floor(issuedAtSec);
   const valid_until = valid_from + DAY;
   const decision_hash = await hashPassport({ ...current, valid_from, valid_until });
   const previous_passport_hash = await hashPassport({ ...previous, valid_from, valid_until });
@@ -151,11 +154,68 @@ async function findCreationSignature(rpc: ReturnType<typeof getRpc>, account: st
   return first ? { signature: first.signature, blockTime: first.blockTime == null ? null : Number(first.blockTime) } : null;
 }
 
+export const INSUFFICIENT_SOL = "Insufficient Devnet SOL to issue the verifiable proof.";
+const MIN_LAMPORTS = 20_000_000n; // 0.02 SOL covers credential + schema + attestation rent and fees
+
+/** Reuse the issued_at of a still-valid attestation already on-chain for this passport. */
+async function findActiveIssuedAt(rpc: ReturnType<typeof getRpc>, credential: string, schema: string, pseudoPassportId: string, nowSec: number) {
+  const schemaInfo = await fetchMaybeSchema(rpc, address(schema));
+  if (!schemaInfo.exists) return null;
+  // Attestation layout: discriminator(1) nonce(32) credential(32) schema(32) ...
+  const accounts = await rpc
+    .getProgramAccounts(SOLANA_ATTESTATION_SERVICE_PROGRAM_ADDRESS, {
+      encoding: "base64",
+      filters: [
+        { memcmp: { offset: 33n, bytes: credential as never, encoding: "base58" } },
+        { memcmp: { offset: 65n, bytes: schema as never, encoding: "base58" } },
+      ],
+    })
+    .send();
+  let best: number | null = null;
+  for (const acc of accounts) {
+    try {
+      const raw = Uint8Array.from(atob((acc.account.data as unknown as [string, string])[0]), (c) => c.charCodeAt(0));
+      const att = getAttestationDecoder().decode(raw);
+      const d = deserializeAttestationData<{ pseudonymous_passport_id: string; valid_from: bigint; valid_until: bigint }>(schemaInfo.data, Uint8Array.from(att.data));
+      if (d.pseudonymous_passport_id === pseudoPassportId && Number(d.valid_until) > nowSec) {
+        const from = Number(d.valid_from);
+        if (best === null || from > best) best = from;
+      }
+    } catch {
+      /* skip undecodable accounts */
+    }
+  }
+  return best;
+}
+
+function humanize(e: unknown): Error {
+  const msg = e instanceof Error ? `${e.message} ${JSON.stringify((e as { context?: unknown }).context ?? "", (_k, v) => (typeof v === "bigint" ? v.toString() : v))}` : String(e);
+  if (/insufficient|no record of a prior credit|AccountNotFound|InsufficientFundsForRent/i.test(msg)) return new Error(INSUFFICIENT_SOL);
+  return e instanceof Error ? e : new Error(msg);
+}
+
 export async function issueOrFetchProof() {
+  try {
+    return await issueOrFetchProofInner();
+  } catch (e) {
+    throw humanize(e);
+  }
+}
+
+async function issueOrFetchProofInner() {
   const rpc = getRpc();
   const authority = await getAuthority();
-  const payload = await buildOnchainPayload(Math.floor(Date.now() / 1000));
-  const { credential, schema } = await ensureCredentialAndSchema(rpc, authority);
+  const nowSec = Math.floor(Date.now() / 1000);
+  const [credential] = await deriveCredentialPda({ authority: authority.address, name: CREDENTIAL_NAME });
+  const [schemaAddr] = await deriveSchemaPda({ credential, name: SCHEMA_NAME, version: SCHEMA_VERSION });
+  const probe = await buildOnchainPayload(nowSec);
+  const activeIssuedAt = await findActiveIssuedAt(rpc, credential, schemaAddr, probe.pseudonymous_passport_id, nowSec);
+  const payload = activeIssuedAt === null ? probe : await buildOnchainPayload(activeIssuedAt);
+  if (activeIssuedAt === null) {
+    const { value: lamports } = await rpc.getBalance(authority.address).send();
+    if (lamports < MIN_LAMPORTS) throw new Error(INSUFFICIENT_SOL);
+  }
+  const { schema } = await ensureCredentialAndSchema(rpc, authority);
   const nonce = await deriveNonce(payload);
   const [attestation] = await deriveAttestationPda({ credential, schema, nonce });
 

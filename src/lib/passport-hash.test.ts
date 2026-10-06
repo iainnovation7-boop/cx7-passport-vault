@@ -25,7 +25,8 @@ describe("on-chain payload", () => {
     expect(Object.keys(p).sort()).toEqual(SCHEMA_FIELDS.map(([n]) => n).sort());
     const raw = JSON.stringify(p);
     for (const forbidden of ["CX7-PP-0002", "CX7-ORG-DEMO", "1600000", "1800000", "REAPPROVED", "supplier"]) expect(raw).not.toContain(forbidden);
-    expect(p.valid_until - p.valid_from).toBe(86400);
+    expect(p.valid_from).toBe(NOW);
+    expect(p.valid_until).toBe(NOW + 86400);
   });
   it("derives the same nonce for the same passport and a new one when the hash changes", async () => {
     const p = await buildOnchainPayload(NOW);

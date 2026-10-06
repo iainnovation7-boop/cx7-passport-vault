@@ -83,7 +83,7 @@ export function LiveScenario() {
         note: verified
           ? "Only pseudonymous identifiers and SHA-256 hashes are on-chain. No names, amounts or documents."
           : proof && !proof.ok
-            ? `Proof could not be issued: ${proof.error}. The passport is unchanged — you can retry.`
+            ? `Proof could not be issued: ${proof.error.replace(/\.$/, "")}. The passport is unchanged — you can retry.`
             : "Issue a real, verifiable attestation on Solana Devnet. Only hashes and pseudonymous identifiers are sent.",
       }
     : base;
