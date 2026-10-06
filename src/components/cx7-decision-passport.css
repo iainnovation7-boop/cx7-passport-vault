@@ -27,9 +27,9 @@
 }
 .cx7-ready-stage {position:relative;width:min(100%,1102px);aspect-ratio:1122/1402;}
 .cx7-ready-art {display:block;width:100%;height:auto;user-select:none;}
-.cx7-ready-hotspot {position:absolute;appearance:none;border:0;padding:0;background:transparent;height:auto;border-radius:24px;transition:box-shadow .22s ease,background .22s ease,transform .22s ease;}
+.cx7-ready-hotspot {position:absolute;appearance:none;border:0;padding:0;background:transparent;height:auto;border-radius:24px;z-index:2;transition:box-shadow .22s ease,background .22s ease,transform .22s ease;}
 .cx7-ready-hotspot:hover,.cx7-ready-hotspot:focus-visible {outline:none;background:var(--home-hover);box-shadow:var(--home-hover-shadow);transform:translateY(-2px);}
-.cx7-ready-core {left:25%;top:21%;width:50%;height:40%;}
+.cx7-ready-core {left:23.5%;top:17%;width:53%;height:45%;}
 .cx7-ready-platform {left:4%;top:69%;width:22%;height:20%;}
 .cx7-ready-passport {left:28.2%;top:69%;width:22%;height:20%;}
 .cx7-ready-gate {left:52.4%;top:69%;width:22%;height:20%;}
