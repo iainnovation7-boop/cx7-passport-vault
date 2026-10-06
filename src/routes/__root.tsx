@@ -4,6 +4,7 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
   type ErrorComponentProps,
@@ -88,10 +89,11 @@ const nav = [
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const isHome = useRouterState({ select: (state) => state.location.pathname === "/" });
   return (
     <QueryClientProvider client={queryClient}>
       <div className="min-h-screen">
-        <header className="sticky top-0 z-30 border-b bg-background/70 backdrop-blur-xl">
+        <header className={isHome ? "hidden" : "sticky top-0 z-30 border-b bg-background/70 backdrop-blur-xl"}>
           <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-4">
             <Link to="/" className="flex items-center gap-3">
               <span className="grid size-8 place-items-center rounded-md bg-gold-gradient font-display text-xs font-bold text-primary-foreground">CX7</span>
@@ -107,10 +109,10 @@ function RootComponent() {
             </nav>
           </div>
         </header>
-        <main className="mx-auto max-w-7xl px-5 py-12">
+        <div className={isHome ? "" : "mx-auto max-w-7xl px-5 py-12"}>
           <Outlet />
-        </main>
-        <footer className="mx-auto max-w-7xl px-5 pb-10">
+        </div>
+        <footer className={isHome ? "hidden" : "mx-auto max-w-7xl px-5 pb-10"}>
           <div className="hairline mb-6" />
           <p className="eyebrow text-center">AI permissions expire when reality changes</p>
         </footer>
