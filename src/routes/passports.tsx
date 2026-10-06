@@ -17,7 +17,7 @@ export const Route = createFileRoute("/passports")({
 
 function Page() {
   const [sel, setSel] = useState(0);
-  const p = passports[sel];
+  const p = passports[sel]!;
   return (
     <>
       <PageHeader step="02 · Authority" title="Decision Passport" sub="Who may decide what, up to which limit, until when.">

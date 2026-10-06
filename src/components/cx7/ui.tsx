@@ -22,7 +22,7 @@ const tone: Record<string, string> = {
 
 export function Status({ value }: { value: string }) {
   return (
-    <span className={cn("inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border px-2.5 py-0.5 font-mono text-[10px] tracking-widest uppercase", tone[value] ?? tone.EXPIRED)}>
+    <span className={cn("inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border px-2.5 py-0.5 font-mono text-[10px] tracking-widest uppercase", tone[value] ?? tone["EXPIRED"])}>
       <span className="size-1.5 rounded-full bg-current" />
       {value}
     </span>

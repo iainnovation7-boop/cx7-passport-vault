@@ -17,7 +17,7 @@ export const Route = createFileRoute("/platforms")({
 
 function Page() {
   const [sel, setSel] = useState(0);
-  const p = platforms[sel];
+  const p = platforms[sel]!;
   return (
     <>
       <PageHeader step="01 · Source" title="Your Platform / AI Agent" sub="Every system that requests authority, in one place.">

@@ -18,7 +18,7 @@ export const Route = createFileRoute("/gate")({
 function Page() {
   const [check, setCheck] = useState<"idle" | "running" | "done">("idle");
   const run = () => { setCheck("running"); setTimeout(() => setCheck("done"), 1400); };
-  const top = gateLog[1];
+  const top = gateLog[1]!;
   return (
     <>
       <PageHeader step="03 · Control" title="Execution Gate" sub="Nothing executes without a valid passport behind it.">
