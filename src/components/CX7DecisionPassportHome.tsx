@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import homeArt from "@/assets/cx7-decision-passport-home-green.png";
-import { homePanels, scenarioEvents } from "@/components/cx7/home-panels";
+import { homePanels } from "@/components/cx7/home-panels";
 import { LiveScenario } from "@/components/cx7/LiveScenario";
 import "./cx7-decision-passport.css";
 
