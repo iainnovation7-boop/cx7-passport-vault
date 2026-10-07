@@ -37,3 +37,12 @@ export function onchainLabel(r: OnchainRead): string {
 }
 
 export const AWAITING_FUNDING = "ISSUANCE UNAVAILABLE (DEVNET BALANCE)";
+
+/** Human-readable read/write error; never shows raw Solana error codes. */
+export function humanizeSolanaError(raw: string | undefined | null): string {
+  const s = String(raw ?? "");
+  if (/statusCode%3D429|Too Many Requests/i.test(s)) return "the Solana Devnet RPC is rate-limiting requests — try again shortly";
+  if (/statusCode%3D403|Forbidden|Solana error #8100002/i.test(s)) return "the Solana Devnet RPC refused the request (HTTP 403) — no data was read";
+  if (/Solana error #\d+/.test(s)) return "the Solana Devnet RPC returned an error — no data was read";
+  return s.replace(/\.$/, "");
+}

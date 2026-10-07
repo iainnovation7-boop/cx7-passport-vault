@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useServerFn } from "@tanstack/react-start";
 import { getScenarioAuthority, getScenarioPremise, issueVerifiableProof, revokePassportN1, type ProofResult, type RevokeResult, type ScenarioAuthority } from "@/lib/solana-proof.functions";
-import { AWAITING_FUNDING, isGenuineProof, onchainLabel } from "@/lib/onchain-display";
+import { AWAITING_FUNDING, humanizeSolanaError, isGenuineProof, onchainLabel } from "@/lib/onchain-display";
 import type { PremiseReading } from "@/lib/pyth-premise";
 import { premiseRows } from "./premise-view";
 
@@ -121,7 +121,7 @@ export function LiveScenario() {
         note: verified
           ? "Only pseudonymous identifiers and SHA-256 hashes are on-chain. No names, amounts or documents."
           : proof && !proof.ok
-            ? `Proof could not be issued: ${proof.error.replace(/\.$/, "")}. The passport is unchanged — you can retry.`
+            ? `Proof could not be issued: ${humanizeSolanaError(proof.error)}. The passport is unchanged — you can retry.`
             : "The SAS cycle n1 ISSUED → VALID → REVOKED → n2 ISSUED → VALID was executed and independently confirmed on Devnet, including n2 lineage to n1. This is historical evidence, not a claim of current validity. Current status comes from live reads; proof details appear only after verification in this session.",
       }
     : base;
@@ -183,7 +183,7 @@ export function LiveScenario() {
               ))}
             </div>
           ) : (
-            <p className="cx7-ready-note">{premise ? `Live read unavailable: ${premise.error}` : "Reading Pyth SOL/USD on Solana Devnet…"}</p>
+            <p className="cx7-ready-note">{premise ? `Live read unavailable: ${humanizeSolanaError(premise.error)}` : "Reading Pyth SOL/USD on Solana Devnet…"}</p>
           )}
           <Button variant="ghost" className="cx7-ready-cta" disabled={reading} onClick={refreshPremise}>{reading ? "Reading…" : "Refresh live price ↻"}</Button>
         </section>
@@ -204,7 +204,7 @@ export function LiveScenario() {
               <div className="cx7-ready-metric"><small>Authority balance</small><strong>{(auth.lamports / 1e9).toFixed(4)} SOL{auth.lamports < MIN_LAMPORTS ? ` · ${AWAITING_FUNDING}` : ""}</strong></div>
             </div>
           ) : (
-            <p className="cx7-ready-note">{authority && !authority.ok ? `Read unavailable: ${authority.error}` : "Reading passport state on Solana Devnet…"}</p>
+            <p className="cx7-ready-note">{authority && !authority.ok ? `Read unavailable: ${humanizeSolanaError(authority.error)}` : "Reading passport state on Solana Devnet…"}</p>
           )}
         </section>
       )}
@@ -221,7 +221,7 @@ export function LiveScenario() {
       {isProofStep && revokedOk && (
         <p className="cx7-ready-reason">n1 REVOKED on-chain · {short(revokedOk.signature)} — <a href={revokedOk.explorerUrl} target="_blank" rel="noreferrer">Explorer ↗</a>. You can now issue n2.</p>
       )}
-      {isProofStep && revocation && !revocation.ok && <p className="cx7-ready-reason">Revocation not executed: {revocation.error.replace(/\.$/, "")}.</p>}
+      {isProofStep && revocation && !revocation.ok && <p className="cx7-ready-reason">Revocation not executed: {humanizeSolanaError(revocation.error)}.</p>}
       {isProofStep && n1Valid && funded && (
         <Button variant="ghost" className="cx7-ready-cta" disabled={revoking} onClick={runRevoke}>{revoking ? "Revoking n1 on Solana Devnet…" : "Revoke n1 On-Chain →"}</Button>
       )}
