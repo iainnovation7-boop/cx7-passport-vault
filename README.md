@@ -40,8 +40,8 @@ Your Platform  →  Decision Passport  →  Execution Gate  →  Solana Proof
 | Live SOL/USD premise read from Pyth on Devnet | **Real, working** |
 | Reading authority balance / attestation accounts on Devnet | **Real, working** |
 | SAS Credential + Schema `CX7_DECISION_PASSPORT_V2` derivation | Implemented |
-| Attestation issuance (n1, n2) | Implemented — **PENDING DEVNET SOL** |
-| On-chain revocation of n1 (`closeAttestation`) | Implemented — **PENDING DEVNET SOL** |
+| Attestation issuance (n1, n2) | **Executed on-chain (Devnet)** — n1 and n2 issued, VALID confirmed |
+| On-chain revocation of n1 (`closeAttestation`) | **Executed on-chain (Devnet)** — REVOKED confirmed |
 
 ### Pyth on Devnet (real)
 
@@ -80,12 +80,16 @@ A passport is classified as `VALID`, `EXPIRED`, `REVOKED` or `NOT_FOUND` from re
 - The Devnet authority keypair is derived deterministically from that secret, so it never changes and never leaves the server.
 - Public authority address (Devnet): `BSjrPNLtyBKfh2xW1QLwRDceU2zcnmzqayv3rJpY6i1K`.
 
-## Current state of the demo (transparent)
+## Real vs Demonstrated (transparent)
 
-- **Live Scenario steps 1–5** (Authority valid → Premise changed → Execution blocked → Human review → Execution approved) are a **demonstrative narrative of the business process** with illustrative data, labelled `DEMO` in the UI. Step 4 shows human review and the *conceptual* authorization of supersession; no on-chain revocation or issuance happens in steps 1–5.
-- **Step 6 is where the real cryptographic operations live**: SAS issuance of n1, verification, on-chain revocation of n1 and issuance of n2.
-- **Pyth SOL/USD and Solana Devnet reads are real**, labelled `REAL DATA`.
-- **SAS issuance and revocation are implemented in code but have not yet run on-chain.** The authority wallet currently holds 0 Devnet SOL, so real execution is **PENDING DEVNET SOL**. n1 has not been revoked and n2 has not been issued on-chain; no transaction signature or Explorer link exists yet, and none is shown.
+- **Live Scenario steps 1–5** (Authority valid → Premise changed → Execution blocked → Human review → Execution approved) remain a **controlled, demonstrative business scenario** with illustrative data, labelled `DEMO` in the UI. Step 4 shows human review and the *conceptual* authorization of supersession; no on-chain operation happens in steps 1–5.
+- **Pyth SOL/USD read is real** (Devnet `PriceUpdateV2` account), labelled `REAL DATA`.
+- **Solana Devnet state reads are real** (authority, attestation accounts, verification states).
+- **Deterministic hashing, HMAC pseudonymisation and versioning are real** and covered by tests.
+- **SAS issuance of n1 was executed on-chain.**
+- **SAS revocation of n1 was executed on-chain, and REVOKED was confirmed** by an independent post-transaction read.
+- **SAS issuance of n2 was executed on-chain, and VALID was confirmed** by an independent post-transaction read.
+- **The n1 → n2 lineage was verified**: n2 carries n1's version id and decision hash as its predecessor (see On-chain evidence).
 
 ## Differentiator
 
@@ -112,4 +116,37 @@ Covers deterministic hashing, versioning/nonce derivation, verification states, 
 
 ## On-chain evidence
 
-_To be added after the first real Devnet run: n1 issued → n1 VALID → n1 revoked → REVOKED → n2 issued (signatures + Solana Explorer Devnet links)._
+Real cycle executed on **Solana Devnet** via the Solana Attestation Service (Schema `CX7_DECISION_PASSPORT_V2`, Credential `CX7_DECISION_AUTHORITY`, authority `BSjrPNLtyBKfh2xW1QLwRDceU2zcnmzqayv3rJpY6i1K`).
+
+**n1 ISSUED → VALID → REVOKED → n2 ISSUED → VALID**
+
+### 1. n1 — ISSUED → VALID
+
+- Attestation: `EHQWmk8bK2zmK182szJc4t16mm582XRf4z37r9WLB3vg`
+- Decision Hash: `93439792fecb33d3f67c748d3ce489bf0ed134cde09dd4253b7758408c01d3bf`
+- Transaction: `2GAAiF2hKEF4AfEfZvyZzGFDWRL3wJFxSAMQMxFShyKGcyDvSEaYR7PuX5ihAcL8GsBKQU8f2FPzTJWojGVc1Njg`
+- Explorer: https://explorer.solana.com/tx/2GAAiF2hKEF4AfEfZvyZzGFDWRL3wJFxSAMQMxFShyKGcyDvSEaYR7PuX5ihAcL8GsBKQU8f2FPzTJWojGVc1Njg?cluster=devnet
+- Post-transaction read: `VALID`
+
+### 2. n1 — VALID → REVOKED
+
+- Attestation: same n1 attestation (`EHQWmk8bK2zmK182szJc4t16mm582XRf4z37r9WLB3vg`)
+- Transaction: `PRvfiykWTGQcyQK5Xy8Fn55hDMKiAcnRaRhyPi3SgEAFSGS7VR1ESa7ZZzVwrkLNWufXUvY3bDQUv61jtjzTEop`
+- Explorer: https://explorer.solana.com/tx/PRvfiykWTGQcyQK5Xy8Fn55hDMKiAcnRaRhyPi3SgEAFSGS7VR1ESa7ZZzVwrkLNWufXUvY3bDQUv61jtjzTEop?cluster=devnet
+- Independent post-transaction read: `REVOKED` (create + close history on-chain)
+
+### 3. n2 — ISSUED → VALID
+
+- Attestation: `Gg3U2nNnDKmMKr5EMsdL8b1ccJPrhs9wUbUrz8TW1htN`
+- Decision Hash: `ddc72df74f82fab97a9e0eb32ed26fceecb9b0ede5636c8a0dc16a3ffa524d32`
+- Transaction: `2aPPTZys6LxCoBs8Jiy6yW87TajoWUAcPMdzDw1kJL8uTU63iDnrthP7gV4psiYHhKjFJ1tXNq3nk5migNvXJC1E`
+- Explorer: https://explorer.solana.com/tx/2aPPTZys6LxCoBs8Jiy6yW87TajoWUAcPMdzDw1kJL8uTU63iDnrthP7gV4psiYHhKjFJ1tXNq3nk5migNvXJC1E?cluster=devnet
+- Post-transaction read: `VALID`
+
+### Verified n2 lineage
+
+- `lineage_id`: `3c1e2fec66679b9f6ad4e68e432e7ceb8ab36e118df601e7c2d2840a7665bc92`
+- `previous_version_id`: `6c97f7d711fc8d5615166b8efa6ba4a98b2810be2ecb248f77b123d03ed6d6b7` (n1 version id)
+- `previous_decision_hash`: `93439792fecb33d3f67c748d3ce489bf0ed134cde09dd4253b7758408c01d3bf` (n1 decision hash)
+
+> Permission expires when reality changes.
