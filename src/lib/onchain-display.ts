@@ -36,4 +36,4 @@ export function onchainLabel(r: OnchainRead): string {
   }
 }
 
-export const AWAITING_FUNDING = "AWAITING DEVNET FUNDING";
+export const AWAITING_FUNDING = "ISSUANCE UNAVAILABLE (DEVNET BALANCE)";

@@ -30,7 +30,7 @@ const stages: Stage[] = [
   {
     kicker: "Step 3 · Execution gate",
     status: "EXECUTION BLOCKED",
-    fields: [["Agent request", "Execute R$ 1.750.000"], ["Passport checked", "PREMISE CHANGED"], ["Gate result", "EXECUTION BLOCKED", true], ["On-chain revocation of n1", AWAITING_FUNDING]],
+    fields: [["Agent request", "Execute R$ 1.750.000"], ["Passport checked", "PREMISE CHANGED"], ["Gate result", "EXECUTION BLOCKED", true], ["On-chain revocation of n1", "EXECUTED · HISTORICAL SAS RECORD"]],
     reason: "Authority no longer valid — governing premise changed.",
     cta: "Human Review →",
     events: ["Execution Blocked"],
@@ -38,23 +38,23 @@ const stages: Stage[] = [
   {
     kicker: "Step 4 · Human review",
     status: "VALID NOW",
-    fields: [["Previous passport", "SUPERSEDED", true], ["New passport status", "VALID NOW", true], ["New authorized amount", "R$ 1.600.000", true], ["Supplier Risk", "REVIEWED"], ["Human Authority", "REAPPROVED"], ["n2 issuance on-chain", AWAITING_FUNDING]],
+    fields: [["Previous passport", "SUPERSEDED", true], ["New passport status", "VALID NOW", true], ["New authorized amount", "R$ 1.600.000", true], ["Supplier Risk", "REVIEWED"], ["Human Authority", "REAPPROVED"], ["n2 issuance on-chain", "EXECUTED · HISTORICAL SAS RECORD"]],
     cta: "Retry Execution →",
     events: ["Human Review Started", "Previous Passport Superseded", "New Passport Issued"],
   },
   {
     kicker: "Step 5 · Execution approved",
     status: "EXECUTION APPROVED",
-    fields: [["Passport checked", "VALID NOW"], ["Within approved conditions", "YES"], ["Gate result", "EXECUTION APPROVED", true], ["Blockchain execution", AWAITING_FUNDING]],
+    fields: [["Passport checked", "VALID NOW"], ["Within approved conditions", "YES"], ["Gate result", "EXECUTION APPROVED", true], ["Blockchain execution", "DEMO · NO BUSINESS TRANSACTION"]],
     cta: "Solana Proof →",
     events: ["Execution Approved"],
   },
   {
     kicker: "Step 6 · Solana proof",
-    status: AWAITING_FUNDING,
+    status: "SAS CYCLE RECORDED",
     fields: [],
     cta: "Restart Scenario ↻",
-    events: ["Solana Proof Pending"],
+    events: ["Solana Proof History Available"],
   },
 ];
 
@@ -98,7 +98,7 @@ export function LiveScenario() {
   const isProofStep = step === stages.length - 1;
   const verified = proof && isGenuineProof(proof) && proof.ok ? proof : null;
   const funded = authority?.ok ? authority.lamports >= MIN_LAMPORTS : false;
-  const proofStatus = issuing ? "ISSUING…" : verified ? "VERIFIED" : proof ? "FAILED" : funded ? "READY TO ISSUE" : AWAITING_FUNDING;
+  const proofStatus = issuing ? "ISSUING…" : verified ? "VERIFIED" : proof ? "FAILED" : funded ? "READY TO CHECK PROOF" : AWAITING_FUNDING;
   const stage: Stage = isProofStep
     ? {
         ...base,
@@ -122,7 +122,7 @@ export function LiveScenario() {
           ? "Only pseudonymous identifiers and SHA-256 hashes are on-chain. No names, amounts or documents."
           : proof && !proof.ok
             ? `Proof could not be issued: ${proof.error.replace(/\.$/, "")}. The passport is unchanged — you can retry.`
-            : "No attestation exists yet. No signature, Explorer link or on-chain status is shown until one is really issued.",
+            : "The SAS cycle n1 ISSUED → VALID → REVOKED → n2 ISSUED → VALID was executed and independently confirmed on Devnet, including n2 lineage to n1. This is historical evidence, not a claim of current validity. Current status comes from live reads; proof details appear only after verification in this session.",
       }
     : base;
   const timeline = [...stages.slice(0, step + 1).flatMap((s) => s.events), ...(isProofStep && verified ? ["Proof Verified on Solana"] : [])];
@@ -163,7 +163,7 @@ export function LiveScenario() {
       <p className="cx7-ready-subtitle">Decision Passport → Premise Monitor → Execution Gate → Solana Proof</p>
       <div className="cx7-ready-status-row">
         <span className="cx7-ready-status" aria-live="polite">{stage.status}</span>
-        {isProofStep ? <Origin real={!!verified} label={verified ? "REAL · VERIFIED ON-CHAIN" : "NOT YET ON-CHAIN"} /> : <Origin real={false} label="DEMO · NOT YET ON-CHAIN" />}
+        {isProofStep ? <Origin real={!!verified} label={verified ? "REAL · VERIFIED ON-CHAIN" : "PROOF NOT VERIFIED IN THIS SESSION"} /> : <Origin real={false} label="DEMO · CONTROLLED BUSINESS SCENARIO" />}
       </div>
       <div className="cx7-ready-grid">
         {stage.fields.map(([label, value, changed]) => (
@@ -229,7 +229,7 @@ export function LiveScenario() {
         <Button asChild variant="ghost" className="cx7-ready-cta"><a href={verified.explorerUrl} target="_blank" rel="noreferrer">View on Solana Explorer ↗</a></Button>
       )}
       <Button variant="ghost" className="cx7-ready-cta" onClick={() => setStep(last ? 0 : step + 1)}>{stage.cta}</Button>
-      <p className="cx7-ready-note">REAL blocks are live reads (Pyth price, Solana Devnet state). DEMO steps are a front-end narrative; revocation, execution and issuance on-chain await Devnet funding.</p>
+      <p className="cx7-ready-note">Steps 1–5 are a controlled business demonstration, not real business execution. Pyth/Solana blocks marked live show real reads. The SAS cycle n1 → REVOKED → n2 was executed and independently confirmed on Devnet, with n2 lineage to n1. Historical issuance does not guarantee current validity; current status and available Devnet balance are shown by live reads.</p>
     </>
   );
 }
