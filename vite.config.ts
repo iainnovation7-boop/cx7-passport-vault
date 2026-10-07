@@ -14,7 +14,8 @@ export default defineConfig({
     resolve: {
       alias: [
         { find: /^ws$/, replacement: fileURLToPath(new URL("./src/lib/ws-shim.ts", import.meta.url)) },
-        { find: /^buffer$/, replacement: "buffer/" },
+        { find: /^@solana\/kit$/, replacement: fileURLToPath(new URL("./node_modules/@solana/kit/dist/index.node.mjs", import.meta.url)) },
+        { find: /^buffer$/, replacement: fileURLToPath(new URL("./node_modules/buffer/index.js", import.meta.url)) },
       ],
     },
   },
