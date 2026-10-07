@@ -76,7 +76,7 @@ describe("No fabricated on-chain status", () => {
     expect(onchainLabel(null)).not.toContain("VALID");
     expect(onchainLabel({ ok: true, status: "VALID", attestation: "not-an-address" })).toBe("UNVERIFIED");
     expect(onchainLabel({ ok: true, status: "VALID", attestation: att })).toBe("VALID ON-CHAIN");
-    expect(AWAITING_FUNDING).toBe("AWAITING DEVNET FUNDING");
+    expect(AWAITING_FUNDING).toBe("ISSUANCE UNAVAILABLE (DEVNET BALANCE)");
   });
 });
 

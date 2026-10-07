@@ -40,12 +40,12 @@ export const homePanels = {
     title: 'Verifiable proof without exposing corporate data.',
     subtitle: 'External integrity layer',
     metrics: [
-      ['Network','Solana'],
-      ['Proof status','Not connected yet'],
+      ['Network','Solana Devnet'],
+      ['Proof status','SAS cycle executed · historical evidence'],
       ['Sensitive data','Never on-chain'],
       ['Record','Cryptographic proof only']
     ],
-    note: 'This screen intentionally does not fake a blockchain transaction. The live Solana connection belongs to the next implementation stage.'
+    note: 'The SAS cycle n1 ISSUED → VALID → REVOKED → n2 ISSUED → VALID was executed and independently confirmed on Solana Devnet, including n2 lineage to n1. This panel describes historical evidence; current validity is determined by live reads. Steps 1–5 remain a controlled business demonstration.'
   }
 } as const;
 
@@ -54,5 +54,5 @@ export const scenarioEvents = [
   ["14:07:03", "Execution Blocked", "EXECUTION BLOCKED"],
   ["14:09", "Human Review Started", "UNDER REVIEW"],
   ["14:10", "New Passport Issued", "VALID NOW"],
-  ["14:11", "Solana Proof Pending", "PROOF PENDING"],
+  ["14:11", "Solana Proof History Available", "HISTORICAL EVIDENCE"],
 ] as const;
