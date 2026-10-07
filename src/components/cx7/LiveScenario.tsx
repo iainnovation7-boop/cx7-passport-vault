@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useServerFn } from "@tanstack/react-start";
-import { getScenarioAuthority, getScenarioPremise, issueVerifiableProof, type ProofResult, type ScenarioAuthority } from "@/lib/solana-proof.functions";
+import { getScenarioAuthority, getScenarioPremise, issueVerifiableProof, revokePassportN1, type ProofResult, type RevokeResult, type ScenarioAuthority } from "@/lib/solana-proof.functions";
 import { AWAITING_FUNDING, isGenuineProof, onchainLabel } from "@/lib/onchain-display";
 import type { PremiseReading } from "@/lib/pyth-premise";
 import { premiseRows } from "./premise-view";
@@ -75,6 +75,9 @@ export function LiveScenario() {
   const [authority, setAuthority] = useState<ScenarioAuthority | null>(null);
   const [premise, setPremise] = useState<{ ok: true; reading: PremiseReading } | { ok: false; error: string } | null>(null);
   const [reading, setReading] = useState(false);
+  const revoke = useServerFn(revokePassportN1);
+  const [revocation, setRevocation] = useState<RevokeResult | null>(null);
+  const [revoking, setRevoking] = useState(false);
 
   const refreshPremise = useCallback(async () => {
     setReading(true);
@@ -133,11 +136,25 @@ export function LiveScenario() {
       setIssuing(false);
     }
   };
+  const runRevoke = async () => {
+    setRevoking(true);
+    try {
+      setRevocation(await revoke());
+    } catch (e) {
+      setRevocation({ ok: false, error: e instanceof Error ? e.message : "Request failed" });
+    } finally {
+      setRevoking(false);
+      loadAuthority().then(setAuthority, () => undefined);
+      setProof(null);
+    }
+  };
   const last = step === stages.length - 1;
   const showPremise = step <= 2;
   const showAuthority = step === 0 || step === 3 || isProofStep;
   const auth = authority?.ok ? authority : null;
   const versionView = auth ? (step === 0 ? auth.n1 : auth.n2) : null;
+  const n1Valid = !!auth && auth.n1.read.ok && auth.n1.read.status === "VALID" && auth.n2.read.ok && auth.n2.read.status === "NOT_FOUND";
+  const revokedOk = revocation?.ok ? revocation : null;
 
   return (
     <>
@@ -200,6 +217,13 @@ export function LiveScenario() {
       </div>
       {isProofStep && !verified && funded && (
         <Button variant="ghost" className="cx7-ready-cta" disabled={issuing} onClick={runProof}>{issuing ? "Issuing on Solana Devnet…" : proof ? "Retry ↻" : "Issue Verifiable Proof →"}</Button>
+      )}
+      {isProofStep && revokedOk && (
+        <p className="cx7-ready-reason">n1 REVOKED on-chain · {short(revokedOk.signature)} — <a href={revokedOk.explorerUrl} target="_blank" rel="noreferrer">Explorer ↗</a>. You can now issue n2.</p>
+      )}
+      {isProofStep && revocation && !revocation.ok && <p className="cx7-ready-reason">Revocation not executed: {revocation.error.replace(/\.$/, "")}.</p>}
+      {isProofStep && n1Valid && funded && (
+        <Button variant="ghost" className="cx7-ready-cta" disabled={revoking} onClick={runRevoke}>{revoking ? "Revoking n1 on Solana Devnet…" : "Revoke n1 On-Chain →"}</Button>
       )}
       {verified && (
         <Button asChild variant="ghost" className="cx7-ready-cta"><a href={verified.explorerUrl} target="_blank" rel="noreferrer">View on Solana Explorer ↗</a></Button>
