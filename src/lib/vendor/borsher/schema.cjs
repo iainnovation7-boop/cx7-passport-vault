@@ -34,7 +34,7 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BorshSchema = void 0;
-const buffer_1 = require("buffer/");
+const buffer_1 = require("../../../../node_modules/buffer/index.js");
 const borsh = __importStar(require("borsh"));
 class BorshSchema {
     schema;
