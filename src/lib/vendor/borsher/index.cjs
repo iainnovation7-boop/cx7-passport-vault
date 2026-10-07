@@ -1,0 +1,13 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.BorshSchema = void 0;
+exports.borshSerialize = borshSerialize;
+exports.borshDeserialize = borshDeserialize;
+function borshSerialize(schema, value) {
+    return schema.serialize(value);
+}
+function borshDeserialize(schema, buffer) {
+    return schema.deserialize(buffer);
+}
+var schema_1 = require("./schema.cjs");
+Object.defineProperty(exports, "BorshSchema", { enumerable: true, get: function () { return schema_1.BorshSchema; } });

@@ -11,20 +11,11 @@ export default defineConfig({
   // Published-runtime compatibility: route Node-only CommonJS deps of the Solana libs to bundled equivalents
   // so the server never needs createRequire at startup (which crashes the published runtime with HTTP 500).
   vite: {
-    plugins: [
-      {
-        // borsher (used by sas-lib) does require("buffer"); point it at the bundled npm "buffer" package
-        // ("buffer/") instead of the runtime builtin, which would need createRequire.
-        name: "cx7-borsher-buffer",
-        enforce: "pre",
-        transform(code: string, id: string) {
-          if (id.includes("/node_modules/borsher/dist/")) return code.replace('require("buffer")', 'require("buffer/")');
-          return null;
-        },
-      },
-    ],
     resolve: {
       alias: [
+        // borsher (used by sas-lib) does require("buffer"), which the published runtime can only load via createRequire;
+        // this verbatim copy points it at the bundled npm "buffer" package instead.
+        { find: /^borsher$/, replacement: fileURLToPath(new URL("./src/lib/vendor/borsher/index.cjs", import.meta.url)) },
         { find: /^ws$/, replacement: fileURLToPath(new URL("./src/lib/ws-shim.ts", import.meta.url)) },
         { find: /^@solana\/kit$/, replacement: fileURLToPath(new URL("./node_modules/@solana/kit/dist/index.node.mjs", import.meta.url)) },
       ],
