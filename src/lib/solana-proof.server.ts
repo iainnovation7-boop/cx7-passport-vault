@@ -72,7 +72,7 @@ export async function getAuthority(): Promise<KeyPairSigner> {
 }
 
 export function getRpc() {
-  return createSolanaRpc(process.env["SOLANA_RPC_URL"] || "https://api.devnet.solana.com");
+  return createSolanaRpc(env("SOLANA_RPC_URL"));
 }
 
 /** Builds the exact on-chain payload for the final passport of the Live Scenario. */
