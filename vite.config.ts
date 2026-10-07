@@ -10,9 +10,19 @@ import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 export default defineConfig({
   // Published-runtime compatibility: route Node-only CommonJS deps of the Solana libs to bundled equivalents
   // so the server never needs createRequire at startup (which crashes the published runtime with HTTP 500).
-  // borsher (used by sas-lib) does require("buffer"); bundle the npm "buffer" package instead of the runtime builtin.
-  nitro: { alias: { buffer: fileURLToPath(new URL("./node_modules/buffer/index.js", import.meta.url)) } },
   vite: {
+    plugins: [
+      {
+        // borsher (used by sas-lib) does require("buffer"); point it at the bundled npm "buffer" package
+        // ("buffer/") instead of the runtime builtin, which would need createRequire.
+        name: "cx7-borsher-buffer",
+        enforce: "pre",
+        transform(code: string, id: string) {
+          if (id.includes("/node_modules/borsher/dist/")) return code.replace('require("buffer")', 'require("buffer/")');
+          return null;
+        },
+      },
+    ],
     resolve: {
       alias: [
         { find: /^ws$/, replacement: fileURLToPath(new URL("./src/lib/ws-shim.ts", import.meta.url)) },
