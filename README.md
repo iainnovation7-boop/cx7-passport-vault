@@ -82,9 +82,14 @@ A passport is classified as `VALID`, `EXPIRED`, `REVOKED` or `NOT_FOUND` from re
 
 ## Current state of the demo (transparent)
 
-- **Live Scenario steps 1–5** (Authority valid → Premise changed → Execution blocked → Human review → Execution approved) are a **controlled demonstration** with illustrative data. They are labelled `DEMO` in the UI.
+- **Live Scenario steps 1–5** (Authority valid → Premise changed → Execution blocked → Human review → Execution approved) are a **demonstrative narrative of the business process** with illustrative data, labelled `DEMO` in the UI. Step 4 shows human review and the *conceptual* authorization of supersession; no on-chain revocation or issuance happens in steps 1–5.
+- **Step 6 is where the real cryptographic operations live**: SAS issuance of n1, verification, on-chain revocation of n1 and issuance of n2.
 - **Pyth SOL/USD and Solana Devnet reads are real**, labelled `REAL DATA`.
-- **Issuance and revocation are implemented but have not yet run on-chain.** The authority wallet currently holds 0 Devnet SOL, so the first on-chain execution is **PENDING DEVNET SOL**. No transaction signature or Explorer link exists yet, and none is shown.
+- **SAS issuance and revocation are implemented in code but have not yet run on-chain.** The authority wallet currently holds 0 Devnet SOL, so real execution is **PENDING DEVNET SOL**. n1 has not been revoked and n2 has not been issued on-chain; no transaction signature or Explorer link exists yet, and none is shown.
+
+## Differentiator
+
+CX7 introduces a dynamic, premise-bounded authority model in which execution permission can be invalidated as real-world conditions change, with cryptographic lineage and on-chain supersession.
 
 ## Running locally
 
