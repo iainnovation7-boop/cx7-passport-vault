@@ -26,6 +26,8 @@ import {
   getCreateAttestationInstruction,
   getCreateCredentialInstruction,
   getCreateSchemaInstruction,
+  getCloseAttestationInstruction,
+  deriveEventAuthorityAddress,
   serializeAttestationData,
 } from "sas-lib";
 import { hashPassport, PROTOCOL_VERSION, scenarioPassports, sha256Bytes, toHex } from "./passport-hash";
@@ -242,4 +244,35 @@ export async function getAuthorityInfo() {
   const [credential] = await deriveCredentialPda({ authority: authority.address, name: CREDENTIAL_NAME });
   const [schema] = await deriveSchemaPda({ credential, name: SCHEMA_V2_NAME, version: SCHEMA_V2_VERSION });
   return { authority: authority.address, lamports: Number(value), credential, schema, schemaName: SCHEMA_V2_NAME };
+}
+
+/**
+ * Revokes passport n1 of the scenario on-chain via the official SAS closeAttestation instruction.
+ * Takes no input: the address is derived server-side from n1's versioned nonce and checked against a real read.
+ * Succeeds only if a fresh read afterwards classifies n1 as REVOKED.
+ */
+export async function revokeScenarioN1() {
+  try {
+    const { verifyPassportVersion } = await import("./passport-verify.server");
+    const { scenarioVersions } = await import("./scenario-authority.server");
+    const { assertRevocable } = await import("./passport-revoke");
+    const rpc = getRpc();
+    const authority = await getAuthority();
+    const { n1, n2 } = await scenarioVersions();
+    const [credential] = await deriveCredentialPda({ authority: authority.address, name: CREDENTIAL_NAME });
+    const [schema] = await deriveSchemaPda({ credential, name: SCHEMA_V2_NAME, version: SCHEMA_V2_VERSION });
+    const [derived] = await deriveAttestationPda({ credential, schema, nonce: getAddressDecoder().decode(await versionNonceSeed(n1)) });
+    const [s1, s2] = await Promise.all([verifyPassportVersion(n1), verifyPassportVersion(n2)]);
+    const attestation = assertRevocable({ target: n1, expectedN1: n1, derivedAttestation: derived, verifiedAttestation: s1.attestation, status: s1.status, successorStatus: s2.status });
+    const { value: lamports } = await rpc.getBalance(authority.address).send();
+    if (lamports < 1_000_000n) throw new Error(INSUFFICIENT_SOL);
+    const signature = await send(rpc, authority, [
+      getCloseAttestationInstruction({ payer: authority, authority, credential, attestation: address(attestation), eventAuthority: await deriveEventAuthorityAddress() }),
+    ]);
+    const after = await verifyPassportVersion(n1);
+    if (after.status !== "REVOKED") throw new Error(`Close transaction confirmed but n1 reads ${after.status}, not REVOKED.`);
+    return { attestation, signature, status: after.status, explorerUrl: `https://explorer.solana.com/tx/${signature}?cluster=devnet` };
+  } catch (e) {
+    throw humanize(e);
+  }
 }

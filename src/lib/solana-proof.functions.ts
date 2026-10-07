@@ -68,3 +68,18 @@ export const getScenarioPremise = createServerFn({ method: "GET" }).handler(asyn
     return { ok: false as const, error: (e instanceof Error ? e.message : String(e)).slice(0, 300) };
   }
 });
+
+export type RevokeResult = { ok: true; attestation: string; signature: string; status: "REVOKED"; explorerUrl: string } | { ok: false; error: string };
+
+/** Revokes scenario n1 on Solana Devnet. No client input is accepted: the target is fixed server-side. */
+export const revokePassportN1 = createServerFn({ method: "POST" }).handler(async (): Promise<RevokeResult> => {
+  try {
+    const { revokeScenarioN1 } = await import("./solana-proof.server");
+    const r = await revokeScenarioN1();
+    return { ok: true, attestation: r.attestation, signature: r.signature, status: "REVOKED", explorerUrl: r.explorerUrl };
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    console.error("[solana-revoke]", msg);
+    return { ok: false, error: msg.slice(0, 300) };
+  }
+});
