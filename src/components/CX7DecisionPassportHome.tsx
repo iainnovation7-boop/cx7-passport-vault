@@ -21,7 +21,12 @@ export default function CX7DecisionPassportHome() {
     <div className="cx7-approved-home">
       <main className="cx7-ready-stage" aria-label="CX7 Decision Passport">
         <img className="cx7-ready-art" src={homeArt} width={1122} height={1402} alt="IA Innovation — CX7 Decision Passport — Governed authority for autonomous systems" />
-        <Button variant="ghost" className="cx7-ready-hotspot cx7-ready-core" aria-label="Open CX7 Decision Passport live scenario" onClick={() => open("scenario")} />
+        <Button variant="ghost" className="cx7-ready-hotspot cx7-ready-core" aria-label="Open CX7 Decision Passport live scenario" onClick={() => open("scenario")}>
+          <span className="cx7-ready-start" aria-hidden="true">
+            <span className="cx7-ready-start-kicker">START LIVE DEMO</span>
+            <span className="cx7-ready-start-sub">Run the decision authority scenario</span>
+          </span>
+        </Button>
         {(["platform", "passport", "gate", "proof"] as const).map((key) => (
           <Button key={key} variant="ghost" className={`cx7-ready-hotspot cx7-ready-${key}`} aria-label={`Open ${homePanels[key].kicker.slice(5)}`} onClick={() => open(key)} />
         ))}

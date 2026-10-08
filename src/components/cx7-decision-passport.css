@@ -33,6 +33,13 @@
 .cx7-ready-hotspot {position:absolute;appearance:none;border:0;padding:0;background:transparent;height:auto;border-radius:24px;z-index:2;transition:box-shadow .22s ease,background .22s ease,transform .22s ease;}
 .cx7-ready-hotspot:hover,.cx7-ready-hotspot:focus-visible {outline:none;background:var(--home-hover);box-shadow:var(--home-hover-shadow);transform:translateY(-2px);}
 .cx7-ready-core {left:23.5%;top:17%;width:53%;height:45%;}
+.cx7-ready-core::after {content:"";position:absolute;inset:0;}
+/* Centered start cue: reuses the core hotspot's open("scenario") handler */
+.cx7-ready-start {position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:9px;pointer-events:none;text-align:center;padding:14px 28px;border:1px solid var(--home-line);border-radius:999px;background:rgba(5,6,7,.6);backdrop-filter:blur(6px);box-shadow:0 0 22px rgba(221,180,107,.1),inset 0 0 14px rgba(221,180,107,.05);transition:border-color .22s ease,box-shadow .22s ease,background .22s ease;}
+.cx7-ready-core:hover .cx7-ready-start,.cx7-ready-core:focus-visible .cx7-ready-start {border-color:rgba(47,174,116,.55);background:rgba(5,6,7,.78);box-shadow:0 0 0 1px rgba(47,174,116,.3),0 0 26px rgba(47,174,116,.14),inset 0 0 14px rgba(221,180,107,.05);}
+.cx7-ready-start-kicker {font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:clamp(11px,1.5vw,14px);font-weight:600;letter-spacing:.32em;text-transform:uppercase;white-space:nowrap;background:linear-gradient(90deg,#E8C778,#F1D49C 50%,#C9A04E);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.cx7-ready-start-sub {font-size:clamp(10px,1.3vw,12.5px);color:var(--home-muted);white-space:nowrap;}
+@media(max-width:640px){.cx7-ready-start{padding:10px 18px;gap:6px;}.cx7-ready-start-kicker{letter-spacing:.22em;}}
 .cx7-ready-platform {left:4%;top:69%;width:22%;height:20%;}
 .cx7-ready-passport {left:28.2%;top:69%;width:22%;height:20%;}
 .cx7-ready-gate {left:52.4%;top:69%;width:22%;height:20%;}
