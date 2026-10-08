@@ -23,8 +23,8 @@ export default function CX7DecisionPassportHome() {
         <img className="cx7-ready-art" src={homeArt} width={1122} height={1402} alt="IA Innovation — CX7 Decision Passport — Governed authority for autonomous systems" />
         <Button variant="ghost" className="cx7-ready-hotspot cx7-ready-core" aria-label="Open CX7 Decision Passport live scenario" onClick={() => open("scenario")}>
           <span className="cx7-ready-start" aria-hidden="true">
-            <span className="cx7-ready-start-kicker">START LIVE DEMO</span>
-            <span className="cx7-ready-start-sub">Run the decision authority scenario</span>
+            <span className="cx7-ready-start-dot" />
+            <span className="cx7-ready-start-word">START</span>
           </span>
         </Button>
         {(["platform", "passport", "gate", "proof"] as const).map((key) => (
