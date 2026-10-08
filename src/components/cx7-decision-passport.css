@@ -35,7 +35,7 @@
 .cx7-ready-core {left:23.5%;top:17%;width:53%;height:45%;}
 .cx7-ready-core::after {content:"";position:absolute;inset:0;}
 /* Center start cue: reuses the core hotspot's open("scenario") handler */
-.cx7-ready-start {position:absolute;left:50%;top:71.6%;transform:translate(-50%,-50%);display:inline-flex;align-items:center;gap:clamp(8px,1.4vw,12px);pointer-events:none;white-space:nowrap;}
+.cx7-ready-start {position:absolute;left:50%;top:72.2%;transform:translate(-50%,-50%);display:inline-flex;align-items:center;gap:clamp(8px,1.4vw,12px);pointer-events:none;white-space:nowrap;}
 .cx7-ready-start-dot {position:relative;width:6px;height:6px;border-radius:50%;background:var(--home-cyan);box-shadow:0 0 8px rgba(47,174,116,.7),0 0 16px rgba(47,174,116,.32);animation:cx7-start-pulse 3.2s ease-in-out infinite;}
 .cx7-ready-start-dot::after {content:"";position:absolute;left:50%;top:50%;width:6px;height:6px;margin:-3px 0 0 -3px;border:1px solid rgba(47,174,116,.5);border-radius:50%;animation:cx7-start-ring 3.2s ease-out infinite;}
 .cx7-ready-start-word {font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:clamp(9px,1.15vw,11px);font-weight:300;letter-spacing:.46em;text-indent:.46em;color:var(--home-gold);opacity:.76;transition:opacity .3s ease;}
