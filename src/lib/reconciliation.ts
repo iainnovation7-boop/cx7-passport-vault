@@ -2,7 +2,7 @@
 // Detects divergences between independently captured versions of a process.
 // It NEVER chooses which version is correct: every divergence starts UNRESOLVED
 // and only an explicit human validation can turn it into governed authority.
-import { hashPassport, type PassportRecord } from "./passport-hash";
+import { type PassportRecord } from "./passport-hash";
 
 export type ProcessRole = { id: string; label: string; isValidator: boolean };
 export type ProcessDef = { name: string; policy: string; roles: ProcessRole[] };
@@ -69,11 +69,11 @@ export type Facts = {
 };
 
 export function extractFacts(text: string): Facts {
-  const limits = [...text.matchAll(/(\d+(?:[.,]\d+)?)\s*%/g)].map((m) => Number(m[1]!.replace(",", ".")));
+  const limits = [...text.matchAll(/(\d+(?:[.,]\d+)?)\s*%/g)].map((m) => Number((m[1] ?? "").replace(",", ".")));
   const conditions: string[] = [];
   const c = text.match(CONDITION);
   if (c) {
-    const n = NUM_WORDS[c[2]!.toLowerCase()] ?? Number(c[2]);
+    const n = NUM_WORDS[(c[2] ?? "").toLowerCase()] ?? Number(c[2]);
     conditions.push(`customer history > ${Number.isFinite(n) ? n : c[2]} years`);
   }
   return {
@@ -107,7 +107,7 @@ export function compareVersions(def: ProcessDef, versions: ProcessVersion[]): Co
 
   // Approval limits
   const withLimits = facts.filter((x) => x.f.limits.length);
-  if (withLimits.length && !withLimits.every((x) => eq(x.f.limits, withLimits[0]!.f.limits))) {
+  if (withLimits.length && !withLimits.every((x) => eq(x.f.limits, (withLimits[0]?.f.limits ?? [])))) {
     push({
       topic: "Approval limit",
       category: "approval_limit",
@@ -117,7 +117,7 @@ export function compareVersions(def: ProcessDef, versions: ProcessVersion[]): Co
       question: "Which limit is valid, and under which conditions may it be exceeded?",
     });
   } else if (withLimits.length === facts.length && withLimits.length) {
-    agreements.push({ topic: "Approval limit", statement: `${withLimits[0]!.f.limits.join("% / ")}%` });
+    agreements.push({ topic: "Approval limit", statement: `${(withLimits[0]?.f.limits ?? []).join("% / ")}%` });
   }
 
   // Informal exceptions (condition known by only some sources)
@@ -154,7 +154,7 @@ export function compareVersions(def: ProcessDef, versions: ProcessVersion[]): Co
       statements: facts.map((x) => ({
         source: x.source,
         statement: x.f.informalChannels.length
-          ? `Via ${x.f.informalChannels.join(", ")} — “${find(x.text, INFORMAL.find((i) => x.f.informalChannels.includes(i.key))!.re)}”`
+          ? `Via ${x.f.informalChannels.join(", ")} — “${find(x.text, (INFORMAL.find((i) => x.f.informalChannels.includes(i.key))?.re ?? /$^/))}”`
           : x.f.formalChannel ? `Formal system — “${find(x.text, FORMAL)}”` : "Channel not specified.",
       })),
       whyItMatters: "Authority is being exercised outside the formal system of record.",
@@ -167,7 +167,7 @@ export function compareVersions(def: ProcessDef, versions: ProcessVersion[]): Co
 
   // Approver / authorized role
   const withApprovers = facts.filter((x) => x.f.approvers.length);
-  if (withApprovers.length && !withApprovers.every((x) => eq(x.f.approvers, withApprovers[0]!.f.approvers))) {
+  if (withApprovers.length && !withApprovers.every((x) => eq(x.f.approvers, (withApprovers[0]?.f.approvers ?? [])))) {
     push({
       topic: "Authorized approver",
       category: "conflicting_rule",
@@ -177,7 +177,7 @@ export function compareVersions(def: ProcessDef, versions: ProcessVersion[]): Co
       question: "Which role or person is authorized to approve, and up to which limit?",
     });
   } else if (withApprovers.length === facts.length && withApprovers.length) {
-    agreements.push({ topic: "Authorized approver", statement: withApprovers[0]!.f.approvers.join(", ") });
+    agreements.push({ topic: "Authorized approver", statement: (withApprovers[0]?.f.approvers ?? []).join(", ") });
   }
   const noOwner = facts.filter((x) => !x.f.approvers.length && x.source !== "Official policy");
   if (noOwner.length) {
@@ -220,7 +220,7 @@ export type HumanValidation = {
 
 /** Returns the list of reasons validation is not yet acceptable (empty = valid). */
 export function validationErrors(def: ProcessDef, divergences: Divergence[], v: HumanValidation): string[] {
-  const errs: string[] = [];
+  const errs: string[] = ["Verified validator authorization is unavailable in session-only mode."];
   const role = def.roles.find((r) => r.id === v.validatorRoleId);
   if (!role) errs.push("Select the validator role.");
   else if (!role.isValidator) errs.push(`Role “${role.label}” is not authorized to validate.`);
@@ -268,7 +268,7 @@ export function buildAuthorityDraft(def: ProcessDef, versions: ProcessVersion[],
     valid_rule: v.validRule,
     validity_period: v.validityPeriod || "not specified",
     escalation_rule: v.escalation,
-    resolutions: divergences.map((d) => ({ topic: d.topic, resolution: v.resolutions[d.id]! })),
+    resolutions: divergences.map((d) => ({ topic: d.topic, resolution: v.resolutions[d.id] ?? "" })),
     evidence: versions.map((x) => ({ source: label(x.roleId), sealed_at: x.sealedAt })),
     validated_at: now.toISOString(),
     validator: `${v.validatorName} (${label(v.validatorRoleId)})`,
@@ -276,7 +276,9 @@ export function buildAuthorityDraft(def: ProcessDef, versions: ProcessVersion[],
 }
 
 /** Builds an OFF-CHAIN Decision Passport DRAFT using the existing PassportRecord shape. Never issues. */
-export async function createPassportDraft(d: ReconciledAuthorityDraft) {
+export async function createPassportDraft(_d: ReconciledAuthorityDraft): Promise<{ record: PassportRecord; draft_hash: string; onchain: false; status: "DRAFT" }> {
+  throw new Error("Verified validator authorization is required before creating a Decision Passport Draft.");
+  /* Reserved mapping for the existing PassportRecord; not an issuance path.
   const record: PassportRecord = {
     passport_id: null,
     organization_id: null,
@@ -292,5 +294,5 @@ export async function createPassportDraft(d: ReconciledAuthorityDraft) {
     validated_at: d.validated_at,
     authority_state: "DRAFT",
   };
-  return { record, draft_hash: await hashPassport(record), onchain: false as const, status: "DRAFT" as const };
+  return { record, draft_hash: await hashPassport(record), onchain: false as const, status: "DRAFT" as const }; */
 }

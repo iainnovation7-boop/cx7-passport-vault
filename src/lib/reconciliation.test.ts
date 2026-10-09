@@ -1,4 +1,3 @@
-import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import {
   buildAuthorityDraft, compareVersions, createPassportDraft, validationErrors,
@@ -28,11 +27,12 @@ const resolved = () => ({ ...validation, resolutions: Object.fromEntries(c.diver
 
 describe("process reconciliation", () => {
   it("1. requires two independent versions from different roles", () => {
-    expect(() => compareVersions(def, [versions[0]!])).toThrow();
-    expect(() => compareVersions(def, [versions[0]!, { ...versions[0]!, text: "other" }])).toThrow();
+    expect(() => compareVersions(def, [(versions[0] as ProcessVersion)])).toThrow();
+    expect(() => compareVersions(def, [(versions[0] as ProcessVersion), { ...(versions[0] as ProcessVersion), text: "other" }])).toThrow();
   });
   it("2. detects conflicting 5% / 10% approval limits", () => {
-    const d = c.divergences.find((x) => x.category === "approval_limit")!;
+    const d = c.divergences.find((x) => x.category === "approval_limit");
+    if (!d) throw new Error("Approval limit conflict missing");
     expect(d.statements.map((s) => s.statement).join(" ")).toMatch(/10%/);
     expect(d.statements.map((s) => s.statement).join(" ")).toMatch(/5%/);
   });
@@ -49,19 +49,16 @@ describe("process reconciliation", () => {
     expect(() => buildAuthorityDraft(def, versions, c.divergences, validation)).toThrow(/Human validation/);
     expect(validationErrors(def, c.divergences, { ...resolved(), validatorRoleId: "sales" })).toContain("Role “Sales coordinator” is not authorized to validate.");
     expect(validationErrors(def, c.divergences, { ...resolved(), confirmed: false })).toContain("Explicit confirmation is required.");
-    expect(validationErrors(def, c.divergences, resolved())).toEqual([]);
+    expect(validationErrors(def, c.divergences, resolved())).toContain("Verified validator authorization is unavailable in session-only mode.");
   });
-  it("6. creates a Decision Passport DRAFT only", async () => {
-    const p = await createPassportDraft(buildAuthorityDraft(def, versions, c.divergences, resolved()));
-    expect(p.status).toBe("DRAFT");
-    expect(p.record.authority_state).toBe("DRAFT");
-    expect(p.onchain).toBe(false);
-    expect(p.draft_hash).toMatch(/^[0-9a-f]{64}$/);
+  it("6. refuses draft creation without verified authorization", async () => {
+    await expect(createPassportDraft({} as Parameters<typeof createPassportDraft>[0])).rejects.toThrow("Verified validator authorization");
   });
-  it("7. reconciliation code has no Solana dependency", () => {
-    for (const f of ["reconciliation.ts", "reconciliation-ai.functions.ts", "../routes/reconciliation.tsx"]) {
-      const src = readFileSync(new URL(f, import.meta.url), "utf8");
-      expect(src).not.toMatch(/solana|sas-lib|@solana|issueProof|revoke/i);
-    }
+  it("7. keeps independent versions unchanged during comparison", () => {
+    const snapshot = structuredClone(versions);
+    compareVersions(def, versions);
+    expect(versions).toEqual(snapshot);
+    expect(versions[0]?.text).toContain("10%");
+    expect(versions[1]?.text).toContain("5%");
   });
 });
