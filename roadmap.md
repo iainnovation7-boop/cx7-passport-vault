@@ -1,5 +1,9 @@
 # Competition restructuring
 
+- [ ] Verify the supplied v5 proof using read-only Devnet requests; do not change the principal CX7 project or create transactions.
+- [ ] Replace hackathon Home with the concise v5 case, hash, proof and verification explanation; remove unrelated principal navigation.
+- [ ] Run existing and proof tests, inspect automatic typecheck/build and mobile/desktop; publish only this hackathon site if all checks pass, then verify its public Home.
+
 - [x] Remove mock public experiences and claims; expose reconciliation and real evidence only.
 - [x] Enable explicit current-session human resolution and content-derived hashed Passport Draft.
 - [x] Assess safe dynamic SAS issuance; excluded from the public experience because verified issuer authorization and abuse controls are unavailable. Public writers fail closed; no transaction executed.
