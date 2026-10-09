@@ -1,5 +1,8 @@
 # Process Reconciliation
 
+- [x] Adjust only START size/position; verify recorded v4 history, 65/65 tests, four-module navigation on mobile 390×844 and desktop 1280×1800, and automatic build OK; no publication or transactions.
+- [ ] Separate production-build/typecheck certification: blocked by the environment's prohibition on manual build/typecheck commands; automatic build reports OK but provides no separate typecheck result.
+
 - [x] Restore visible START in its existing centered position and traverse the four existing v5 dialogs; 65/65 tests, build OK, mobile 390×844 and desktop verified with no page errors or server calls, publication or transactions.
 
 - [x] Reintegrate supplied v5 evidence into the restored Home's existing dialogs; artwork and styling unchanged, 64/64 tests and build OK, mobile 390×844 and desktop verified without page errors or overflow; preview only, no Solana transactions. Recorded FINALIZED/MATCH are not presented as fresh live verification.
