@@ -1,6 +1,6 @@
 # Process Reconciliation
 
-- [ ] Restore visible START and verify the existing four v5 dialogs sequentially on mobile/desktop, without publication or transactions.
+- [x] Restore visible START in its existing centered position and traverse the four existing v5 dialogs; 65/65 tests, build OK, mobile 390×844 and desktop verified with no page errors or server calls, publication or transactions.
 
 - [x] Reintegrate supplied v5 evidence into the restored Home's existing dialogs; artwork and styling unchanged, 64/64 tests and build OK, mobile 390×844 and desktop verified without page errors or overflow; preview only, no Solana transactions. Recorded FINALIZED/MATCH are not presented as fresh live verification.
 
