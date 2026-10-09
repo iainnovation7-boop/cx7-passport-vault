@@ -10,7 +10,10 @@ describe("Localized v5 evidence preservation", () => {
   });
   it.each(["en", "pt-BR"] as const)("preserves the 5/8/10/12 percent results and exception requirement in %s", language => {
     const metrics = homeLanguages[language].panels.gate.metrics;
-    expect(metrics.map(([label]) => Number.parseInt(label))).toEqual([5, 8, 10, 12]);
+    expect(metrics.map(([label]) => {
+      if (typeof label !== "string") throw new Error("Every outcome must have a percentage label");
+      return Number.parseInt(label);
+    })).toEqual([5, 8, 10, 12]);
     expect(metrics.map(([, result]) => result)).toEqual(["AUTHORIZED", "BLOCKED", "AUTHORIZED", "BLOCKED"]);
     expect(homeV5.outcomes.map(({ exception }) => exception)).toEqual([false, false, true, false]);
   });

@@ -1,6 +1,6 @@
 # Process Reconciliation
 
-- [ ] Diagnose original Home languages and add consistent EN/PT-BR selection to its four existing modules without changing artwork, evidence or START flow; verify both languages on mobile/desktop and run tests, preview only.
+- [x] Published originals confirmed English in all four Home dialogs (browser translation remains the likely source of mixed screenshots); EN/PT-BR selection added only to approved Home/dialogs, retaining original bitmap English lettering and official evidence values; both languages pass four-module navigation on mobile 390×844 and desktop 1280×1800, 70 tests pass; preview only, no transactions.
 
 - [x] Adjust only START size/position; verify recorded v4 history, 65/65 tests, four-module navigation on mobile 390×844 and desktop 1280×1800, and automatic build OK; no publication or transactions.
 - [ ] Separate production-build/typecheck certification: blocked by the environment's prohibition on manual build/typecheck commands; automatic build reports OK but provides no separate typecheck result.
