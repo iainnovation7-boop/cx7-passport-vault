@@ -9,6 +9,8 @@ export const Route = createFileRoute("/demo")({
       { name: "description", content: "Watch a decision passport react to a changed premise, end to end." },
       { property: "og:title", content: "Run Live Scenario — CX7" },
       { property: "og:description", content: "Passport issued, premise changed, execution blocked, proof verified." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Page,
@@ -45,6 +47,7 @@ function Page() {
       <PageHeader step="Live Scenario" title="Run Live Scenario" sub="Nine seconds. One broken premise. Authority that responds.">
         <Btn variant="gold" onClick={start} disabled={running}>{running ? "Running…" : step >= 0 ? "Replay Scenario" : "Run Demo Scenario"}</Btn>
       </PageHeader>
+      <p className="mb-6 text-xs text-muted-foreground">Controlled demonstration · Illustrative events and signatures · No on-chain verification or business execution</p>
 
       <div className="grid gap-8 lg:grid-cols-[1.1fr_1fr]">
         <div className="glass-gold flex min-h-[320px] flex-col justify-between rounded-3xl p-10">

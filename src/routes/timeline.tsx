@@ -9,6 +9,8 @@ export const Route = createFileRoute("/timeline")({
       { name: "description", content: "How authority changes as reality changes, event by event." },
       { property: "og:title", content: "Authority Timeline — CX7" },
       { property: "og:description", content: "A live record of passports, premises, blocks and proofs." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Page,
@@ -20,6 +22,7 @@ function Page() {
   return (
     <>
       <PageHeader step="Live record" title="Authority Timeline" sub="Authority is not static. It follows reality." />
+      <p className="mb-6 text-xs text-muted-foreground">Illustrative historical sequence · Not a live on-chain record</p>
       <ol className="relative mx-auto max-w-3xl border-l border-gold/20">
         {timeline.map((e) => (
           <li key={e.t} className="relative pb-10 pl-10 last:pb-0">
