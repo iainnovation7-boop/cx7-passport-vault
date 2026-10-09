@@ -80,7 +80,7 @@ function RootShell({ children }: { children: ReactNode }) {
 }
 
 const nav = [
-  { to: "/reconciliation", label: "Reconciliation" },
+  { to: "/reconciliation", label: "Reconciliação" },
   { to: "/platforms", label: "Platforms" },
   { to: "/passports", label: "Passports" },
   { to: "/gate", label: "Gate" },
@@ -100,9 +100,9 @@ function RootComponent() {
               <span className="grid size-8 place-items-center rounded-md bg-gold-gradient font-display text-xs font-bold text-primary-foreground">CX7</span>
               <span className="eyebrow hidden sm:inline">IA Innovation</span>
             </Link>
-            <nav className="flex items-center gap-1 overflow-x-auto text-sm">
+            <nav className="flex min-w-0 items-center gap-1 overflow-x-auto text-sm">
               {nav.map((n) => (
-                <Link key={n.to} to={n.to} className="rounded-full px-3 py-1.5 text-muted-foreground transition-colors hover:text-foreground" activeProps={{ className: "text-gold" }}>
+                <Link key={n.to} to={n.to} className="inline-flex min-h-11 shrink-0 items-center rounded-full px-3 py-1.5 text-muted-foreground transition-colors hover:text-foreground" activeProps={{ className: "text-gold" }}>
                   {n.label}
                 </Link>
               ))}
