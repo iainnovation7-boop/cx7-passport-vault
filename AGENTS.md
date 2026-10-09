@@ -20,4 +20,5 @@
 
 - Public issuance and revocation wrappers fail closed; no signing endpoint may spend the authority balance without verified issuer authorization and abuse controls.
 - Competition evidence reads are isolated from historical writers and validate Devnet genesis and successor references; absence alone cannot establish revocation.
+- The hackathon v5 case uses an independent read-only verifier and a shared proof presentation on Home and Evidence; supplied business snapshot outcomes are separated from chain integrity and never invoke the principal engine.
 - Draft hashing uses Web Crypto canonical JSON and an allowlisted commitment; raw business content stays in session memory.

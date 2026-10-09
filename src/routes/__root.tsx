@@ -82,7 +82,6 @@ function RootShell({ children }: { children: ReactNode }) {
 const nav = [
   { to: "/reconciliation", label: "Reconciliation" },
   { to: "/evidence", label: "Evidence" },
-  { to: "/premise", label: "Pyth" },
 ] as const;
 
 function RootComponent() {
