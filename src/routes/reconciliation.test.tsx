@@ -57,7 +57,7 @@ describe("reconciliation participant interaction", () => {
     fireEvent.click(screen.getByRole("button", { name: "+ Add role" }));
     fireEvent.change(screen.getByPlaceholderText("Role / person 3"), { target: { value: "Finance" } });
     ["C", "S", "Finance"].forEach((role, index) => {
-      fireEvent.click(screen.getByRole("button", { name: role, exact: true }));
+      fireEvent.click(screen.getByRole("button", { name: role }));
       fireEvent.change(screen.getByRole("textbox", { name: `Process version — ${role}` }), { target: { value: `${role} approves 5%.` } });
       expect(count()).toHaveTextContent(new RegExp(`^${index} sealed version`));
       fireEvent.click(screen.getByRole("button", { name: "Seal this version" }));

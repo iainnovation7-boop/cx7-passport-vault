@@ -1,6 +1,6 @@
 # Process Reconciliation
 
-- [ ] Correct sealed-version counter and review text wrapping; verify mobile 390×844 and desktop without publication.
+- [x] Correct sealed-version counter and review text wrapping; mobile 390×844 and desktop checks passed without publication (42/42 tests).
 
 - [x] Verify participant selection, independent drafts and two sealed versions on mobile 390×844 and desktop, without publication (41/41 tests; build OK).
 
