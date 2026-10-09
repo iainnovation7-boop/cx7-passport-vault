@@ -5,15 +5,7 @@ export type ProofResult =
   | { ok: false; error: string };
 
 export const issueVerifiableProof = createServerFn({ method: "POST" }).handler(async (): Promise<ProofResult> => {
-  try {
-    const { issueOrFetchProof } = await import("./solana-proof.server");
-    const p = await issueOrFetchProof();
-    return { ok: true, created: p.created, network: p.network, schemaName: p.schemaName, passportVersion: p.passportVersion, attestation: p.attestation, signature: p.signature, anchoredAt: p.anchoredAt, expiry: p.expiry, explorerUrl: p.explorerUrl };
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e);
-    console.error("[solana-proof]", msg);
-    return { ok: false, error: msg.slice(0, 300) };
-  }
+  return { ok: false, error: "Public issuance requires verified issuer authorization and abuse controls." };
 });
 
 export const getSolanaAuthorityInfo = createServerFn({ method: "GET" }).handler(async () => {
@@ -73,13 +65,5 @@ export type RevokeResult = { ok: true; attestation: string; signature: string; s
 
 /** Revokes scenario n1 on Solana Devnet. No client input is accepted: the target is fixed server-side. */
 export const revokePassportN1 = createServerFn({ method: "POST" }).handler(async (): Promise<RevokeResult> => {
-  try {
-    const { revokeScenarioN1 } = await import("./solana-proof.server");
-    const r = await revokeScenarioN1();
-    return { ok: true, attestation: r.attestation, signature: r.signature, status: "REVOKED", explorerUrl: r.explorerUrl };
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e);
-    console.error("[solana-revoke]", msg);
-    return { ok: false, error: msg.slice(0, 300) };
-  }
+  return { ok: false, error: "Historical reference passports cannot be revoked from the public competition experience." };
 });

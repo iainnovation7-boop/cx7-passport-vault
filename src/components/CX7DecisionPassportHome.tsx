@@ -1,54 +1,19 @@
-import { useRef, useState } from "react";
-import { Link } from "@tanstack/react-router";
-import { Button } from "@/components/ui/button";
-import homeArt from "@/assets/cx7-decision-passport-home-green.png";
-import { homePanels } from "@/components/cx7/home-panels";
-import { LiveScenario } from "@/components/cx7/LiveScenario";
-import "./cx7-decision-passport.css";
-
-type Panel = keyof typeof homePanels | "scenario";
-
+import { Btn } from "@/components/cx7/ui";
+import mark from "@/assets/cx7-mark.png";
 export default function CX7DecisionPassportHome() {
-  const dialog = useRef<HTMLDialogElement>(null);
-  const [active, setActive] = useState<Panel>("scenario");
-  const [openCount, setOpenCount] = useState(0);
-  const panel = active === "scenario" ? null : homePanels[active];
-  const open = (key: Panel) => {
-    setActive(key);
-    setOpenCount((n) => n + 1);
-    dialog.current?.showModal();
-  };
-  return (
-    <div className="cx7-approved-home relative">
-      <nav aria-label="Home navigation" className="absolute right-3 top-1 z-10">
-        <Link to="/reconciliation" className="inline-flex min-h-11 items-center rounded-full px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-gold">Reconciliation</Link>
-      </nav>
-      <main className="cx7-ready-stage" aria-label="CX7 Decision Passport">
-        <img className="cx7-ready-art" src={homeArt} width={1122} height={1402} alt="IA Innovation — CX7 Decision Passport — Governed authority for autonomous systems" />
-        <Button variant="ghost" className="cx7-ready-hotspot cx7-ready-core" aria-label="Open CX7 Decision Passport live scenario" onClick={() => open("scenario")}>
-          <span className="cx7-ready-start" aria-hidden="true">
-            <span className="cx7-ready-start-dot" />
-            <span className="cx7-ready-start-word">START</span>
-          </span>
-        </Button>
-        {(["platform", "passport", "gate", "proof"] as const).map((key) => (
-          <Button key={key} variant="ghost" className={`cx7-ready-hotspot cx7-ready-${key}`} aria-label={`Open ${homePanels[key].kicker.slice(5)}`} onClick={() => open(key)} />
-        ))}
-      </main>
-      <dialog ref={dialog} className="cx7-ready-modal" aria-labelledby="cx7-panel-title" onClick={(event) => {
-        if (event.target !== event.currentTarget) return;
-        const bounds = event.currentTarget.getBoundingClientRect();
-        if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) dialog.current?.close();
-      }}>
-        <Button variant="ghost" size="icon" className="cx7-ready-close" aria-label="Close" onClick={() => dialog.current?.close()}>×</Button>
-        {panel ? <>
-          <p className="cx7-ready-kicker">{panel.kicker}</p>
-          <h2 id="cx7-panel-title">{panel.title}</h2>
-          <p className="cx7-ready-subtitle">{panel.subtitle}</p>
-          <div className="cx7-ready-grid">{panel.metrics.map(([label, value]) => <div className="cx7-ready-metric" key={label}><small>{label}</small><strong>{value}</strong></div>)}</div>
-          <p className="cx7-ready-note">{panel.note}</p>
-        </> : <LiveScenario key={openCount} />}
-      </dialog>
+  return <main className="mx-auto max-w-4xl px-5 py-12 md:py-20">
+    <img src={mark} width={220} height={160} className="mb-6 h-24 w-auto" alt="CX7 authority emblem" />
+    <h1 className="text-4xl font-semibold text-gold md:text-5xl">CX7 Decision Passport</h1>
+    <p className="mt-4 text-sm text-muted-foreground">Powered by the CX7 Decision Authority Engine</p>
+    <p className="mt-8 max-w-2xl text-xl leading-relaxed">AI can execute. CX7 determines whether execution is still authorized.</p>
+    <nav aria-label="Home capabilities" className="mt-10 flex flex-col items-start gap-4">
+      <Btn variant="gold" to="/reconciliation">START RECONCILIATION →</Btn>
+      <Btn to="/evidence">VIEW REAL ON-CHAIN EVIDENCE →</Btn>
+      <Btn to="/premise">LIVE PREMISE — PYTH →</Btn>
+    </nav>
+    <div className="mt-12 border-t pt-6 text-sm leading-relaxed text-muted-foreground">
+      <p>Session-scoped reconciliation. On-chain proof is persistent.</p>
+      <p className="mt-3">Permission expires when reality changes.</p>
     </div>
-  );
+  </main>;
 }
