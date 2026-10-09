@@ -3,7 +3,7 @@
 - [x] Verify the supplied v5 proof using read-only Devnet requests; finalized transaction and matching hash confirmed, without principal CX7 changes or transactions.
 - [x] Replace hackathon Home with the concise v5 case, hash, proof and verification explanation; remove unrelated principal navigation. Business outcomes are explicitly supplied case snapshots, not a live engine decision.
 - [x] Run existing and proof tests (78 passed), automatic typecheck/build OK, desktop 1280×1800 and mobile 390×844 HTTP 200, MATCH and refresh confirmed without overflow, page errors or known secret values in public source/Home.
-- [ ] Publish only this hackathon site and verify its public Home.
+- [x] Publish only this hackathon site and verify its public Home: https://cx7-passport-vault.lovable.app/ HTTP 200, v5 FINALIZED/MATCH, old records absent, mobile without overflow or page errors; no other project published.
 
 - [x] Remove mock public experiences and claims; expose reconciliation and real evidence only.
 - [x] Enable explicit current-session human resolution and content-derived hashed Passport Draft.
