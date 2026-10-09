@@ -179,7 +179,7 @@ function Page() {
 
       {s.authority && (
         <Sec n={6} t="Session-confirmed Authority Draft">
-          <pre className="overflow-x-auto rounded-lg border bg-background/40 p-4 font-mono text-xs">{JSON.stringify(s.authority, null, 2)}</pre>
+          <pre className="max-h-80 overflow-auto whitespace-pre-wrap rounded-lg border bg-background/40 p-4 font-mono text-xs [overflow-wrap:anywhere]">{JSON.stringify(s.authority, null, 2)}</pre>
           <div className="mt-4 flex flex-wrap items-center gap-3">
             <Btn variant="gold" onClick={async () => { if (!s.authority) return; try { up({ passport: await createPassportDraft(s.authority) }); } catch(e) { setMsg(e instanceof Error ? e.message : "Draft creation failed"); } }}>Create Decision Passport Draft</Btn>
             <span className="text-xs text-muted-foreground">Creates an off-chain DRAFT only. No attestation is issued and no organizational authorization is verified.</span>
@@ -187,7 +187,7 @@ function Page() {
           {s.passport && (
             <div className="mt-4 border-t border-gold/30 pt-4">
               <div className="mb-2 flex items-center gap-2"><Status value="DRAFT" /><span className="font-mono text-xs">DRAFT · off-chain · hash {s.passport.draft_hash.slice(0, 16)}…</span></div>
-              <pre className="overflow-x-auto font-mono text-xs">{JSON.stringify(s.passport.record, null, 2)}</pre>
+              <pre className="max-h-96 overflow-auto whitespace-pre-wrap font-mono text-xs [overflow-wrap:anywhere]">{JSON.stringify(s.passport.record, null, 2)}</pre>
             </div>
           )}
         </Sec>

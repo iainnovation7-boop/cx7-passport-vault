@@ -9,7 +9,7 @@ import { address } from "@solana/kit";
 /** Independent, read-only reference evidence. No historical issuance or revocation functions are called. */
 export async function readCompetitionEvidence() {
   const rpc = getRpc();
-  if (await rpc.getGenesisHash().send() !== "EtWTRABZaYq6iMfeYKouRu166VU2xqa1") throw new Error("Expected Solana Devnet.");
+  if (await rpc.getGenesisHash().send() !== "EtWTRABZaYq6iMfeYKouRu166VU2xqa1wcaWoxPkrZBG") throw new Error("Expected Solana Devnet.");
   const { n1, n2, n1Id } = await scenarioVersions();
   const [one, two, info] = await Promise.all([verifyPassportVersion(n1), verifyPassportVersion(n2), getAuthorityInfo()]);
   const [acc1, acc2, schema] = await Promise.all([fetchMaybeAttestation(rpc, address(one.attestation)), fetchMaybeAttestation(rpc, address(two.attestation)), fetchMaybeSchema(rpc, address(info.schema))]);
@@ -30,6 +30,6 @@ export async function readCompetitionEvidence() {
 }
 
 export async function readCompetitionPyth() {
-  if (await getRpc().getGenesisHash().send() !== "EtWTRABZaYq6iMfeYKouRu166VU2xqa1") throw new Error("Expected Solana Devnet.");
+  if (await getRpc().getGenesisHash().send() !== "EtWTRABZaYq6iMfeYKouRu166VU2xqa1wcaWoxPkrZBG") throw new Error("Expected Solana Devnet.");
   return readSolUsdPremise(SCENARIO_PREMISE);
 }
