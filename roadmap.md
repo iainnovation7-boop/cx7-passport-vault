@@ -1,6 +1,6 @@
 # Process Reconciliation
 
-- [ ] Add visible Home/shared navigation access to Reconciliação, preserve START, test mobile/desktop and publish navigation only.
+- [x] Add visible Home/shared navigation access to Reconciliação and preserve START; 42/42 tests, build OK and mobile/desktop navigation checks passed; navigation-only publication authorized.
 
 - [x] Correct sealed-version counter and review text wrapping; mobile 390×844 and desktop checks passed without publication (42/42 tests).
 
