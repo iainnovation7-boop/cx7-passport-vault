@@ -17,14 +17,14 @@ function setup() {
 describe("reconciliation participant interaction", () => {
   it("selects C and S and associates the editor with the selected participant", () => {
     setup();
-    fireEvent.click(screen.getByRole("button", { name: "S", exact: true }));
+    fireEvent.click(screen.getByRole("button", { name: "S" }));
     fireEvent.change(screen.getByRole("textbox", { name: "Process version — S" }), { target: { value: "S approves up to 5%." } });
-    fireEvent.click(screen.getByRole("button", { name: "C", exact: true }));
+    fireEvent.click(screen.getByRole("button", { name: "C" }));
     expect(screen.getByRole("textbox", { name: "Process version — C" })).toHaveValue("");
     fireEvent.change(screen.getByRole("textbox", { name: "Process version — C" }), { target: { value: "C approves up to 10%." } });
-    fireEvent.click(screen.getByRole("button", { name: "S", exact: true }));
+    fireEvent.click(screen.getByRole("button", { name: "S" }));
     expect(screen.getByRole("textbox", { name: "Process version — S" })).toHaveValue("S approves up to 5%.");
-    fireEvent.click(screen.getByRole("button", { name: "C", exact: true }));
+    fireEvent.click(screen.getByRole("button", { name: "C" }));
     expect(screen.getByRole("textbox", { name: "Process version — C" })).toHaveValue("C approves up to 10%.");
   });
 
@@ -40,7 +40,7 @@ describe("reconciliation participant interaction", () => {
     expect(seal()).toBeEnabled();
     fireEvent.click(seal());
     expect(compare).toBeDisabled();
-    fireEvent.click(screen.getByRole("button", { name: "S", exact: true }));
+    fireEvent.click(screen.getByRole("button", { name: "S" }));
     fireEvent.change(screen.getByRole("textbox", { name: "Process version — S" }), { target: { value: "S approves 5%." } });
     fireEvent.click(seal());
     expect(compare).toBeEnabled();
