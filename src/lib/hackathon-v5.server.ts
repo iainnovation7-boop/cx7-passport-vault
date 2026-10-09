@@ -13,7 +13,7 @@ export async function readHackathonV5() {
     fetchMaybeSchema(rpc, address(V5.schema), { commitment: "finalized" }),
     fetchMaybeCredential(rpc, address(V5.credential), { commitment: "finalized" }),
     rpc.getSignatureStatuses([signature(V5.transaction)], { searchTransactionHistory: true }).send(),
-    rpc.getTransaction(signature(V5.transaction), { commitment: "finalized", maxSupportedTransactionVersion: 0 }).send(),
+    rpc.getTransaction(signature(V5.transaction), { encoding: "json", commitment: "finalized", maxSupportedTransactionVersion: 0 }).send(),
   ]);
   if (!a.exists || !s.exists || !c.exists || !tx || tx.meta?.err !== null || statuses.value[0]?.confirmationStatus !== "finalized" || statuses.value[0]?.err !== null) throw new Error("Unverified references");
   if ([a, s, c].some(account => account.programAddress !== SOLANA_ATTESTATION_SERVICE_PROGRAM_ADDRESS) || a.data.credential !== V5.credential || a.data.schema !== V5.schema || a.data.signer !== V5.authority || s.data.credential !== V5.credential || c.data.authority !== V5.authority || !c.data.authorizedSigners.includes(address(V5.authority)) || new TextDecoder().decode(Uint8Array.from(s.data.name)) !== "CX7_DECISION_PASSPORT_V2") throw new Error("Unverified binding");
