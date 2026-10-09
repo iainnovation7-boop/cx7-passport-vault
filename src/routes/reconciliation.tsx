@@ -53,6 +53,7 @@ function Page() {
   const upV = (p: Partial<HumanValidation>) => up({ v: { ...s.v, ...p }, authority: null, passport: null });
   const roles = s.def.roles.filter((r) => r.label.trim());
   const sealed = (id: string) => s.versions.find((v) => v.roleId === id);
+  const sealedCount = s.versions.length;
 
   async function compare() {
     setMsg(null); setBusy(true);
@@ -117,8 +118,10 @@ function Page() {
       </Sec>
 
       <Sec n={3} t="Compare">
-        <Btn variant="gold" disabled={busy || s.versions.length < 2 || !s.def.name.trim()} onClick={compare}>{busy ? "Analyzing…" : "Compare versions"}</Btn>
-        <span className="ml-3 text-xs text-muted-foreground">{s.versions.length} sealed version(s) · minimum 2</span>
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+          <Btn variant="gold" disabled={busy || sealedCount < 2 || !s.def.name.trim()} onClick={compare}>{busy ? "Analyzing…" : "Compare versions"}</Btn>
+          <span key={sealedCount} role="status" aria-label="Sealed version count" className="text-xs text-muted-foreground">{`${sealedCount} sealed version(s) · minimum 2`}</span>
+        </div>
         {msg && <p className="mt-3 text-sm text-warning">{msg}</p>}
         {s.agreements.length > 0 && s.divergences && (
           <p className="mt-4 text-sm"><span className="eyebrow mr-2">Agreed</span>{s.agreements.map((a) => `${a.topic}: ${a.statement}`).join(" · ")}</p>
@@ -130,17 +133,17 @@ function Page() {
           {s.divergences.length === 0 ? <p className="text-sm text-muted-foreground">No divergences detected.</p> : (
             <div className="space-y-4">
               {s.divergences.map((d) => (
-                <div key={d.id} className="border-b py-4">
+                <div key={d.id} className="min-w-0 border-b py-4 [overflow-wrap:anywhere]">
                   <div className="mb-2 flex flex-wrap items-center gap-2">
-                    <span className="font-semibold">{d.topic}</span><Status value="PENDING REVIEW" />
+                    <span className="min-w-0 font-semibold leading-relaxed">{d.topic}</span><Status value="PENDING REVIEW" />
                     <span className="font-mono text-[10px] uppercase text-muted-foreground">{d.origin === "ai" ? "AI-detected" : "rule-detected"}</span>
                   </div>
-                  <div className="grid gap-2 md:grid-cols-2">
+                  <div className="grid min-w-0 gap-3 md:grid-cols-2">
                     {d.statements.map((x, i) => (
-                      <p key={i} className="text-sm"><span className="eyebrow mr-1">{String.fromCharCode(65 + i)} · {x.source}</span><br />{x.statement}</p>
+                      <p key={i} className="min-w-0 text-sm leading-relaxed"><span className="eyebrow mb-1 block leading-relaxed tracking-normal">{String.fromCharCode(65 + i)} · {x.source}</span>{x.statement}</p>
                     ))}
                   </div>
-                  <div className="mt-3 grid gap-2 text-xs text-muted-foreground md:grid-cols-3">
+                  <div className="mt-3 grid min-w-0 gap-2 text-xs leading-relaxed text-muted-foreground md:grid-cols-3 [&>p]:min-w-0">
                     <p><b className="text-foreground">Why it matters:</b> {d.whyItMatters}</p>
                     <p><b className="text-foreground">Risk if unresolved:</b> {d.risk}</p>
                     <p><b className="text-gold-soft">Question:</b> {d.question}</p>

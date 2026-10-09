@@ -47,4 +47,26 @@ describe("reconciliation participant interaction", () => {
     fireEvent.click(screen.getByRole("button", { name: "C · sealed" }));
     expect(screen.queryByRole("textbox", { name: "Process version — C" })).not.toBeInTheDocument();
   });
+
+  it("counts 0, 1, 2 and 3 sealed versions and resets to 0", () => {
+    setup();
+    const count = () => screen.getByRole("status", { name: "Sealed version count" });
+    const compare = () => screen.getByRole("button", { name: "Compare versions" });
+    expect(count()).toHaveTextContent(/^0 sealed version/);
+    expect(compare()).toBeDisabled();
+    fireEvent.click(screen.getByRole("button", { name: "+ Add role" }));
+    fireEvent.change(screen.getByPlaceholderText("Role / person 3"), { target: { value: "Finance" } });
+    ["C", "S", "Finance"].forEach((role, index) => {
+      fireEvent.click(screen.getByRole("button", { name: role, exact: true }));
+      fireEvent.change(screen.getByRole("textbox", { name: `Process version — ${role}` }), { target: { value: `${role} approves 5%.` } });
+      expect(count()).toHaveTextContent(new RegExp(`^${index} sealed version`));
+      fireEvent.click(screen.getByRole("button", { name: "Seal this version" }));
+      expect(count()).toHaveTextContent(new RegExp(`^${index + 1} sealed version`));
+      if (index === 0) expect(compare()).toBeDisabled();
+      else expect(compare()).toBeEnabled();
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Reset session" }));
+    expect(count()).toHaveTextContent(/^0 sealed version/);
+    expect(compare()).toBeDisabled();
+  });
 });
