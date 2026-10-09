@@ -2,7 +2,8 @@
 // Detects divergences between independently captured versions of a process.
 // It NEVER chooses which version is correct: every divergence starts UNRESOLVED
 // and only an explicit human validation can turn it into governed authority.
-import { type PassportRecord } from "./passport-hash";
+import { canonicalize, sha256Hex } from "./passport-hash";
+import { evidenceHashes, expirationError, sessionPassport } from "./session-passport";
 
 export type ProcessRole = { id: string; label: string; isValidator: boolean };
 export type ProcessDef = { name: string; policy: string; roles: ProcessRole[] };
@@ -220,11 +221,13 @@ export type HumanValidation = {
 
 /** Returns the list of reasons validation is not yet acceptable (empty = valid). */
 export function validationErrors(def: ProcessDef, divergences: Divergence[], v: HumanValidation): string[] {
-  const errs: string[] = ["Verified validator authorization is unavailable in session-only mode."];
+  const errs: string[] = [];
+  if (!def.name.trim()) errs.push("Process name is required.");
   const role = def.roles.find((r) => r.id === v.validatorRoleId);
-  if (!role) errs.push("Select the validator role.");
-  else if (!role.isValidator) errs.push(`Role “${role.label}” is not authorized to validate.`);
-  if (!v.validatorName.trim()) errs.push("Validator name is required.");
+  if (!role?.label.trim()) errs.push("Select the confirming participant role.");
+  if (!v.validatorName.trim()) errs.push("Confirming person name is required.");
+  const expiration = expirationError(v.validityPeriod);
+  if (expiration) errs.push(expiration);
   const req: [keyof HumanValidation, string][] = [
     ["decisionType", "Decision type"], ["validRule", "Valid rule"], ["validException", "Valid exception (or “none”)"],
     ["authorizedRole", "Authorized role/person"], ["allowedAction", "Allowed action"], ["premises", "Conditions / premises"],
@@ -251,11 +254,15 @@ export type ReconciledAuthorityDraft = {
   evidence: { source: string; sealed_at: string }[];
   validated_at: string;
   validator: string;
+  confirmation_scope: "CURRENT_SESSION_UNAUTHENTICATED";
+  source_evidence_hashes: string[];
+  reconciliation_hash: string;
 };
 
-export function buildAuthorityDraft(def: ProcessDef, versions: ProcessVersion[], divergences: Divergence[], v: HumanValidation, now = new Date()): ReconciledAuthorityDraft {
+export async function buildAuthorityDraft(def: ProcessDef, versions: ProcessVersion[], divergences: Divergence[], v: HumanValidation, now = new Date()): Promise<ReconciledAuthorityDraft> {
   const errs = validationErrors(def, divergences, v);
   if (errs.length) throw new Error(`Human validation incomplete: ${errs[0]}`);
+  if (new Set(versions.filter(x => x.text.trim()).map(x => x.roleId)).size < 2) throw new Error("Two independent sealed versions are required.");
   const label = (id: string) => def.roles.find((r) => r.id === id)?.label ?? id;
   return {
     process: def.name,
@@ -266,33 +273,20 @@ export function buildAuthorityDraft(def: ProcessDef, versions: ProcessVersion[],
     premises: v.premises,
     exceptions: v.validException,
     valid_rule: v.validRule,
-    validity_period: v.validityPeriod || "not specified",
+    validity_period: v.validityPeriod,
     escalation_rule: v.escalation,
     resolutions: divergences.map((d) => ({ topic: d.topic, resolution: v.resolutions[d.id] ?? "" })),
     evidence: versions.map((x) => ({ source: label(x.roleId), sealed_at: x.sealedAt })),
     validated_at: now.toISOString(),
     validator: `${v.validatorName} (${label(v.validatorRoleId)})`,
+    confirmation_scope: "CURRENT_SESSION_UNAUTHENTICATED",
+    source_evidence_hashes: await evidenceHashes(def, versions),
+    reconciliation_hash: await sha256Hex(canonicalize({ def, versions, divergences, confirmation: v })),
   };
 }
 
 /** Builds an OFF-CHAIN Decision Passport DRAFT using the existing PassportRecord shape. Never issues. */
-export async function createPassportDraft(_d: ReconciledAuthorityDraft): Promise<{ record: PassportRecord; draft_hash: string; onchain: false; status: "DRAFT" }> {
-  throw new Error("Verified validator authorization is required before creating a Decision Passport Draft.");
-  /* Reserved mapping for the existing PassportRecord; not an issuance path.
-  const record: PassportRecord = {
-    passport_id: null,
-    organization_id: null,
-    decision_type: d.decision_type,
-    authorized_role: d.authorized_role,
-    allowed_action: d.allowed_action,
-    limit: d.limits,
-    premises: d.premises,
-    exceptions: d.exceptions,
-    escalation_rule: d.escalation_rule,
-    validity: d.validity_period,
-    human_authority: `VALIDATED_BY ${d.validator}`,
-    validated_at: d.validated_at,
-    authority_state: "DRAFT",
-  };
-  return { record, draft_hash: await hashPassport(record), onchain: false as const, status: "DRAFT" as const }; */
+export async function createPassportDraft(d: ReconciledAuthorityDraft) {
+  const record = await sessionPassport(d);
+  return { record, draft_hash: await sha256Hex(canonicalize(record)), onchain: false as const, status: "DRAFT" as const };
 }
