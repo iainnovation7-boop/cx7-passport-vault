@@ -1,39 +1,38 @@
+import { homeV5 } from "./home-v5";
+
 export const homePanels = {
   platform: {
     kicker: '01 · Your Platform',
-    title: 'Connect what you already use.',
-    subtitle: 'AI agent · ERP · CRM · Public system',
+    title: 'Discount Policy Reconciliation.',
+    subtitle: 'Independent versions · human review',
     metrics: [
-      ['Integration model','API / Event'],
-      ['Authority source','CX7 Decision Passport'],
-      ['Current state','Ready to connect'],
-      ['Data exposure','Private by design']
+      ['Case','Discount policy'],
+      ['Authority source','CX7 Decision Passport v5'],
+      ['Review','Human-governed'],
+      ['Sensitive content','Off-chain']
     ],
-    note: 'The platform remains yours. CX7 adds a governed authority layer before autonomous execution.'
+    note: 'CX7 reconciles process understanding and represents human-governed decision authority. Solana records proof integrity; it does not decide business correctness.'
   },
   passport: {
     kicker: '02 · Decision Passport',
     title: 'Authority that expires when reality changes.',
     subtitle: 'Time-bound · premise-bound · human-governed',
     metrics: [
-      ['Passport status','VALID NOW'],
-      ['Authority owner','Human approver'],
-      ['Validity','Time + conditions'],
-      ['Premises','Continuously monitored']
+      ['Passport',`${homeV5.passport} · ${homeV5.status}`],
+      ['Valid until',homeV5.validUntil],
+      ['Previous version',`${homeV5.predecessor} · ${homeV5.predecessorStatus}`],
+      ['Authority','Human-governed']
     ],
-    note: 'A Decision Passport is not a permanent permission. It stays valid only while its governing premises remain true.'
+    note: 'Recorded v5 case, not a new live validity check. Permission expires when reality changes.'
   },
   gate: {
     kicker: '03 · Execution Gate',
-    title: 'Allow. Block. Review.',
-    subtitle: 'Every action is checked against current authority.',
-    metrics: [
-      ['Requested action','Pending check'],
-      ['Passport','Linked'],
-      ['Premise state','Current'],
-      ['Decision','Allow / Block / Review']
-    ],
-    note: 'The gate evaluates authority at the moment of execution — not only at the moment permission was first granted.'
+    title: 'Authority / Execution.',
+    subtitle: 'Recorded v5 case results',
+    metrics: homeV5.outcomes.map(({ percent, exception, result }) => [
+      `${percent}%${exception ? ' · valid exception' : ''}`, result,
+    ]),
+    note: 'The 10% result requires a valid exception for a customer with more than five years of history. These are recorded case results, not a new execution or simulated gate.'
   },
   proof: {
     kicker: '04 · Solana Proof',
@@ -41,11 +40,11 @@ export const homePanels = {
     subtitle: 'External integrity layer',
     metrics: [
       ['Network','Solana Devnet'],
-      ['Proof status','SAS cycle executed · historical evidence'],
+      ['Transaction status',homeV5.transactionStatus],
+      ['Read-back',homeV5.readBack],
       ['Sensitive data','Never on-chain'],
-      ['Record','Cryptographic proof only']
     ],
-    note: 'The SAS cycle n1 ISSUED → VALID → REVOKED → n2 ISSUED → VALID was executed and independently confirmed on Solana Devnet, including n2 lineage to n1. This panel describes historical evidence; current validity is determined by live reads. Steps 1–5 remain a controlled business demonstration.'
+    note: 'Previously recorded v5 evidence, not a new live verification. Solana anchors cryptographic proof; it does not evaluate discount rules or validate business correctness. Sensitive process content stays off-chain.'
   }
 } as const;
 

@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import homeArt from "@/assets/cx7-decision-passport-home-green.png";
 import { homePanels } from "@/components/cx7/home-panels";
+import { homeV5ProofDetails } from "@/components/cx7/home-v5";
 import { LiveScenario } from "@/components/cx7/LiveScenario";
 import "./cx7-decision-passport.css";
 
@@ -47,6 +48,14 @@ export default function CX7DecisionPassportHome() {
           <p className="cx7-ready-subtitle">{panel.subtitle}</p>
           <div className="cx7-ready-grid">{panel.metrics.map(([label, value]) => <div className="cx7-ready-metric" key={label}><small>{label}</small><strong>{value}</strong></div>)}</div>
           <p className="cx7-ready-note">{panel.note}</p>
+          {active === "proof" && <dl className="cx7-real-block space-y-4">
+            {homeV5ProofDetails.map(([label, value, url]) => <div key={label} className="min-w-0">
+              <dt className="cx7-ready-note">{label}</dt>
+              <dd className="m-0 break-all font-mono text-xs leading-relaxed">
+                {url ? <a href={url} target="_blank" rel="noopener noreferrer" className="text-gold underline underline-offset-4" aria-label={`${label}: ${value} — open Solana Explorer`}>{value}</a> : value}
+              </dd>
+            </div>)}
+          </dl>}
         </> : <LiveScenario key={openCount} />}
       </dialog>
     </div>
