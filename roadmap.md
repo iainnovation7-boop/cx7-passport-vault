@@ -1,5 +1,7 @@
 # Process Reconciliation
 
+- [x] Reintegrate supplied v5 evidence into the restored Home's existing dialogs; artwork and styling unchanged, 64/64 tests and build OK, mobile 390×844 and desktop verified without page errors or overflow; preview only, no Solana transactions. Recorded FINALIZED/MATCH are not presented as fresh live verification.
+
 - [x] Audit English public copy, existing action connections and date/status presentation; 56/56 tests and build OK; desktop/mobile 390×844 checks passed without transactions or publication. Catalogue issuance/review and platform connection remain unavailable; no real flow exists for illustrative records.
 
 - [x] Add visible Home/shared navigation access to Reconciliação and preserve START; 42/42 tests, build OK and mobile/desktop navigation checks passed; navigation-only publication authorized.

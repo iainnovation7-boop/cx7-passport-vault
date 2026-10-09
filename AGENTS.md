@@ -17,3 +17,4 @@
 - On-chain proofs use schema CX7_DECISION_PASSPORT_V2 only (V1 kept for read compatibility, never created); issuance goes n1 → (n1 revoked on-chain) → n2, and the UI shows VERIFIED/VALID ON-CHAIN only through the onchain-display guards so no on-chain status can be shown without a real read.
 - Process Reconciliation is isolated from issuance modules and uses volatile page state; fail closed on governed output until server-verified validator authorization exists, because browser-declared roles are not a security boundary.
 - Static passport catalogue expiration is presentation-only and isolated from authority/verification modules; unavailable catalogue operations stay disabled because illustrative IDs are not on-chain issuance targets.
+- Restored Home evidence is isolated in a presentation-only module and displayed through existing dialogs; supplied historical statuses never trigger RPC, issuance or live-verification claims, preserving all authority modules.
