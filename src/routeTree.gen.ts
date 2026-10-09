@@ -11,11 +11,9 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DemoRouteImport } from './routes/demo'
-import { Route as EvidenceRouteImport } from './routes/evidence'
 import { Route as GateRouteImport } from './routes/gate'
 import { Route as PassportsRouteImport } from './routes/passports'
 import { Route as PlatformsRouteImport } from './routes/platforms'
-import { Route as PremiseRouteImport } from './routes/premise'
 import { Route as ProofsRouteImport } from './routes/proofs'
 import { Route as ReconciliationRouteImport } from './routes/reconciliation'
 import { Route as TimelineRouteImport } from './routes/timeline'
@@ -28,11 +26,6 @@ const IndexRoute = IndexRouteImport.update({
 const DemoRoute = DemoRouteImport.update({
   id: '/demo',
   path: '/demo',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EvidenceRoute = EvidenceRouteImport.update({
-  id: '/evidence',
-  path: '/evidence',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GateRoute = GateRouteImport.update({
@@ -48,11 +41,6 @@ const PassportsRoute = PassportsRouteImport.update({
 const PlatformsRoute = PlatformsRouteImport.update({
   id: '/platforms',
   path: '/platforms',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PremiseRoute = PremiseRouteImport.update({
-  id: '/premise',
-  path: '/premise',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProofsRoute = ProofsRouteImport.update({
@@ -74,11 +62,9 @@ const TimelineRoute = TimelineRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/demo': typeof DemoRoute
-  '/evidence': typeof EvidenceRoute
   '/gate': typeof GateRoute
   '/passports': typeof PassportsRoute
   '/platforms': typeof PlatformsRoute
-  '/premise': typeof PremiseRoute
   '/proofs': typeof ProofsRoute
   '/reconciliation': typeof ReconciliationRoute
   '/timeline': typeof TimelineRoute
@@ -86,11 +72,9 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/demo': typeof DemoRoute
-  '/evidence': typeof EvidenceRoute
   '/gate': typeof GateRoute
   '/passports': typeof PassportsRoute
   '/platforms': typeof PlatformsRoute
-  '/premise': typeof PremiseRoute
   '/proofs': typeof ProofsRoute
   '/reconciliation': typeof ReconciliationRoute
   '/timeline': typeof TimelineRoute
@@ -99,11 +83,9 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/demo': typeof DemoRoute
-  '/evidence': typeof EvidenceRoute
   '/gate': typeof GateRoute
   '/passports': typeof PassportsRoute
   '/platforms': typeof PlatformsRoute
-  '/premise': typeof PremiseRoute
   '/proofs': typeof ProofsRoute
   '/reconciliation': typeof ReconciliationRoute
   '/timeline': typeof TimelineRoute
@@ -113,11 +95,9 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/demo'
-    | '/evidence'
     | '/gate'
     | '/passports'
     | '/platforms'
-    | '/premise'
     | '/proofs'
     | '/reconciliation'
     | '/timeline'
@@ -125,11 +105,9 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/demo'
-    | '/evidence'
     | '/gate'
     | '/passports'
     | '/platforms'
-    | '/premise'
     | '/proofs'
     | '/reconciliation'
     | '/timeline'
@@ -137,11 +115,9 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/demo'
-    | '/evidence'
     | '/gate'
     | '/passports'
     | '/platforms'
-    | '/premise'
     | '/proofs'
     | '/reconciliation'
     | '/timeline'
@@ -150,11 +126,9 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DemoRoute: typeof DemoRoute
-  EvidenceRoute: typeof EvidenceRoute
   GateRoute: typeof GateRoute
   PassportsRoute: typeof PassportsRoute
   PlatformsRoute: typeof PlatformsRoute
-  PremiseRoute: typeof PremiseRoute
   ProofsRoute: typeof ProofsRoute
   ReconciliationRoute: typeof ReconciliationRoute
   TimelineRoute: typeof TimelineRoute
@@ -176,13 +150,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/evidence': {
-      id: '/evidence'
-      path: '/evidence'
-      fullPath: '/evidence'
-      preLoaderRoute: typeof EvidenceRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/gate': {
       id: '/gate'
       path: '/gate'
@@ -202,13 +169,6 @@ declare module '@tanstack/react-router' {
       path: '/platforms'
       fullPath: '/platforms'
       preLoaderRoute: typeof PlatformsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/premise': {
-      id: '/premise'
-      path: '/premise'
-      fullPath: '/premise'
-      preLoaderRoute: typeof PremiseRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/proofs': {
@@ -238,11 +198,9 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DemoRoute: DemoRoute,
-  EvidenceRoute: EvidenceRoute,
   GateRoute: GateRoute,
   PassportsRoute: PassportsRoute,
   PlatformsRoute: PlatformsRoute,
-  PremiseRoute: PremiseRoute,
   ProofsRoute: ProofsRoute,
   ReconciliationRoute: ReconciliationRoute,
   TimelineRoute: TimelineRoute,

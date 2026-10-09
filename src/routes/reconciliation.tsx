@@ -2,10 +2,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Btn, PageHeader, Status } from "@/components/cx7/ui";
 import {
-  buildAuthorityDraft, compareVersions, createPassportDraft, validationErrors,
+  buildAuthorityDraft, compareVersions, createPassportDraft, mergeDivergences, validationErrors,
   type Agreement, type Divergence, type HumanValidation, type ProcessDef, type ProcessVersion, type ReconciledAuthorityDraft,
 } from "@/lib/reconciliation";
-
+import { aiDivergences } from "@/lib/reconciliation-ai.functions";
 
 export const Route = createFileRoute("/reconciliation")({
   head: () => ({
@@ -50,7 +50,7 @@ function Page() {
   const [msg, setMsg] = useState<string | null>(null);
   const up = (p: Partial<S>) => setS((x) => ({ ...x, ...p }));
   const upDef = (p: Partial<ProcessDef>) => up({ def: { ...s.def, ...p }, divergences: null, authority: null, passport: null });
-  const upV = (p: Partial<HumanValidation>) => up({ v: { ...s.v, confirmed: false, ...p }, authority: null, passport: null });
+  const upV = (p: Partial<HumanValidation>) => up({ v: { ...s.v, ...p }, authority: null, passport: null });
   const roles = s.def.roles.filter((r) => r.label.trim());
   const sealed = (id: string) => s.versions.find((v) => v.roleId === id);
   const sealedCount = s.versions.length;
@@ -59,7 +59,10 @@ function Page() {
     setMsg(null); setBusy(true);
     try {
       const c = compareVersions(s.def, s.versions);
-      up({ agreements: c.agreements, divergences: c.divergences, v: { ...emptyV }, authority: null, passport: null });
+      const label = (id: string) => s.def.roles.find((r) => r.id === id)?.label ?? id;
+      const ai = await aiDivergences({ data: { name: s.def.name, policy: s.def.policy, versions: s.versions.map((v) => ({ role: label(v.roleId), text: v.text })) } });
+      if (!ai.ok) setMsg(`AI analysis unavailable (${ai.error}) — showing rule-based findings only.`);
+      up({ agreements: c.agreements, divergences: mergeDivergences(c.divergences, ai.divergences), v: { ...s.v, resolutions: {} }, authority: null, passport: null });
     } catch (e) { setMsg((e as Error).message); } finally { setBusy(false); }
   }
 
@@ -70,7 +73,7 @@ function Page() {
       <PageHeader step="00 · Origin" title="Process Reconciliation" sub="How each role really runs the process — reconciled by a human before it becomes authority.">
         <Btn onClick={() => { setS(init); setActive("r1"); setMsg(null); }}>Reset session</Btn>
       </PageHeader>
-      <p className="mb-6 text-xs text-muted-foreground">Session-scoped reconciliation. On-chain proof is persistent.</p>
+      <p className="mb-6 text-xs text-muted-foreground">Session only · Unsaved · Validator authorization unavailable</p>
 
       <Sec n={1} t="Define the process">
         <div className="grid gap-3 md:grid-cols-2">
@@ -108,7 +111,7 @@ function Page() {
             <Btn disabled={!s.drafts[active]?.trim()} onClick={() => {
               const { [active]: text, ...rest } = s.drafts;
               if (!text?.trim() || sealed(active)) return;
-              up({ authority: null, passport: null, v: { ...emptyV }, drafts: rest, versions: [...s.versions, { roleId: active, text, sealedAt: new Date().toISOString() }], divergences: null });
+              up({ drafts: rest, versions: [...s.versions, { roleId: active, text, sealedAt: new Date().toISOString() }], divergences: null });
             }}>Seal this version</Btn>
           </div>
         ))}
@@ -145,8 +148,8 @@ function Page() {
                     <p><b className="text-foreground">Risk if unresolved:</b> {d.risk}</p>
                     <p><b className="text-gold-soft">Question:</b> {d.question}</p>
                   </div>
-                  <input aria-label={`Resolution — ${d.topic}`} className={`${inp} mt-3`} placeholder="Human resolution (required)" value={s.v.resolutions[d.id] ?? ""}
-                    onChange={(e) => upV({ resolutions: { ...s.v.resolutions, [d.id]: e.target.value }, confirmed: false })} />
+                  <input className={`${inp} mt-3`} placeholder="Human resolution (required)" value={s.v.resolutions[d.id] ?? ""}
+                    onChange={(e) => upV({ resolutions: { ...s.v.resolutions, [d.id]: e.target.value } })} />
                 </div>
               ))}
             </div>
@@ -155,39 +158,39 @@ function Page() {
       )}
 
       {s.divergences && (
-        <Sec n={5} t="Human confirmation — current session">
+        <Sec n={5} t="Human validation">
           <div className="grid gap-3 md:grid-cols-2">
-            <input className={inp} aria-label="Process field" placeholder="Confirming person name" value={s.v.validatorName} onChange={(e) => upV({ validatorName: e.target.value })} />
+            <input className={inp} aria-label="Process field" placeholder="Validator name" value={s.v.validatorName} onChange={(e) => upV({ validatorName: e.target.value })} />
             <select className={inp} value={s.v.validatorRoleId} onChange={(e) => upV({ validatorRoleId: e.target.value })}>
-              <option value="">Confirming participant role…</option>
-              {roles.map((r) => <option key={r.id} value={r.id}>{r.label}</option>)}
+              <option value="">Validator role…</option>
+              {roles.map((r) => <option key={r.id} value={r.id}>{r.label}{r.isValidator ? "" : " (not authorized)"}</option>)}
             </select>
             {([["decisionType", "Decision type"], ["validRule", "Valid rule"], ["validException", "Valid exception (or “none”)"], ["authorizedRole", "Authorized role / person"],
-              ["allowedAction", "Allowed action"], ["premises", "Conditions / premises"], ["approvalLimit", "Approval limit"], ["validityPeriod", "Expiration ISO timestamp with timezone (optional)"],
+              ["allowedAction", "Allowed action"], ["premises", "Conditions / premises"], ["approvalLimit", "Approval limit"], ["validityPeriod", "Validity period (optional)"],
               ["escalation", "Requires escalation / review when…"]] as const).map(([k, l]) => (
               <input key={k} className={inp} placeholder={l} value={s.v[k]} onChange={(e) => upV({ [k]: e.target.value })} />
             ))}
           </div>
           <label className="mt-4 flex items-start gap-2 text-sm">
             <input type="checkbox" className="mt-1" checked={s.v.confirmed} onChange={(e) => upV({ confirmed: e.target.checked })} />
-            I explicitly confirm every resolution and these rules for this session. My identity and organizational authority are not authenticated.
+            I have reviewed every proposed resolution. Authority remains unvalidated until a verified validator confirms it.
           </label>
           {errs.length > 0 && <ul className="mt-3 list-disc pl-5 text-xs text-warning">{errs.map((e) => <li key={e}>{e}</li>)}</ul>}
-          <div className="mt-4"><Btn variant="gold" disabled={errs.length > 0} onClick={async () => { if (!s.divergences) return; try { up({ authority: await buildAuthorityDraft(s.def, s.versions, s.divergences, s.v) }); } catch (e) { setMsg(e instanceof Error ? e.message : "Confirmation failed"); } }}>Confirm session resolutions</Btn></div>
+          <div className="mt-4"><Btn variant="gold" disabled={errs.length > 0} onClick={() => { if (!s.divergences) return; up({ authority: buildAuthorityDraft(s.def, s.versions, s.divergences, s.v) }); }}>Validate</Btn></div>
         </Sec>
       )}
 
       {s.authority && (
-        <Sec n={6} t="Session-confirmed Authority Draft">
-          <pre className="max-h-80 overflow-auto whitespace-pre-wrap rounded-lg border bg-background/40 p-4 font-mono text-xs [overflow-wrap:anywhere]">{JSON.stringify(s.authority, null, 2)}</pre>
+        <Sec n={6} t="Governed output — Reconciled Authority Draft">
+          <pre className="overflow-x-auto rounded-lg border bg-background/40 p-4 font-mono text-xs">{JSON.stringify(s.authority, null, 2)}</pre>
           <div className="mt-4 flex flex-wrap items-center gap-3">
-            <Btn variant="gold" onClick={async () => { if (!s.authority) return; try { up({ passport: await createPassportDraft(s.authority) }); } catch(e) { setMsg(e instanceof Error ? e.message : "Draft creation failed"); } }}>Create Decision Passport Draft</Btn>
-            <span className="text-xs text-muted-foreground">Creates an off-chain DRAFT only. No attestation is issued and no organizational authorization is verified.</span>
+            <Btn variant="gold" onClick={async () => { if (!s.authority) return; up({ passport: await createPassportDraft(s.authority) }); }}>Create Decision Passport Draft</Btn>
+            <span className="text-xs text-muted-foreground">Creates a DRAFT only. Nothing is issued on-chain; existing issuance controls still apply.</span>
           </div>
           {s.passport && (
             <div className="mt-4 border-t border-gold/30 pt-4">
-              <div className="mb-2 flex items-center gap-2"><Status value="DRAFT" /><span className="font-mono text-xs">DRAFT · off-chain · hash {s.passport.draft_hash.slice(0, 16)}…</span></div>
-              <pre className="max-h-96 overflow-auto whitespace-pre-wrap font-mono text-xs [overflow-wrap:anywhere]">{JSON.stringify(s.passport.record, null, 2)}</pre>
+              <div className="mb-2 flex items-center gap-2"><Status value="PENDING" /><span className="font-mono text-xs">DRAFT · off-chain · hash {s.passport.draft_hash.slice(0, 16)}…</span></div>
+              <pre className="overflow-x-auto font-mono text-xs">{JSON.stringify(s.passport.record, null, 2)}</pre>
             </div>
           )}
         </Sec>

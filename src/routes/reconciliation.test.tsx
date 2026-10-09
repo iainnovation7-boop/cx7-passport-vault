@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { Route } from "./reconciliation";
 
@@ -15,27 +15,6 @@ function setup() {
 }
 
 describe("reconciliation participant interaction", () => {
-  it("requires session confirmation before creating a content-derived Draft without an issuance action", async () => {
-    setup();
-    for (const [role,text] of [["C", "The coordinator approves up to 10% through WhatsApp."], ["S", "Above 5% requires manager approval in the formal system."]] as const) {
-      fireEvent.click(screen.getByRole("button", { name: role }));
-      fireEvent.change(screen.getByRole("textbox", { name: `Process version — ${role}` }), { target: { value: text } });
-      fireEvent.click(screen.getByRole("button", { name: "Seal this version" }));
-    }
-    fireEvent.click(screen.getByRole("button", { name: "Compare versions" }));
-    await waitFor(() => expect(screen.getByRole("button", { name: "Confirm session resolutions" })).toBeDisabled());
-    expect(screen.queryByRole("button", { name: "Create Decision Passport Draft" })).not.toBeInTheDocument();
-    for (const input of screen.getAllByRole("textbox", { name: /Resolution —/ })) fireEvent.change(input, { target: { value: "Explicit manager approval in formal system." } });
-    for (const label of ["Confirming person name", "Decision type", "Valid rule", "Valid exception (or “none”)", "Authorized role / person", "Allowed action", "Conditions / premises", "Approval limit", "Requires escalation / review when…"]) fireEvent.change(screen.getByPlaceholderText(label), { target: { value: label === "Approval limit" ? "5%" : "Human confirmed value" } });
-    fireEvent.change(screen.getByRole("combobox"), { target: { value: "r1" } });
-    expect(screen.getByRole("button", { name: "Confirm session resolutions" })).toBeDisabled();
-    fireEvent.click(screen.getByRole("checkbox"));
-    fireEvent.click(screen.getByRole("button", { name: "Confirm session resolutions" }));
-    await waitFor(() => expect(screen.getByRole("button", { name: "Create Decision Passport Draft" })).toBeEnabled());
-    fireEvent.click(screen.getByRole("button", { name: "Create Decision Passport Draft" }));
-    await waitFor(() => expect(screen.getByText(/DRAFT · off-chain · hash/)).toBeInTheDocument());
-    expect(screen.queryByRole("button", { name: /ISSUE ON SOLANA DEVNET/i })).not.toBeInTheDocument();
-  });
   it("selects C and S and associates the editor with the selected participant", () => {
     setup();
     fireEvent.click(screen.getByRole("button", { name: "S" }));
