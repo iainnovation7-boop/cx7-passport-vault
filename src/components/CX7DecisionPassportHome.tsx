@@ -21,7 +21,7 @@ export default function CX7DecisionPassportHome() {
   return (
     <div className="cx7-approved-home relative">
       <nav aria-label="Home navigation" className="absolute right-3 top-1 z-10">
-        <Link to="/reconciliation" className="inline-flex min-h-11 items-center rounded-full px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-gold">Reconciliação</Link>
+        <Link to="/reconciliation" className="inline-flex min-h-11 items-center rounded-full px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-gold">Reconciliation</Link>
       </nav>
       <main className="cx7-ready-stage" aria-label="CX7 Decision Passport">
         <img className="cx7-ready-art" src={homeArt} width={1122} height={1402} alt="IA Innovation — CX7 Decision Passport — Governed authority for autonomous systems" />
