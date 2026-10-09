@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Btn, PageHeader, Status } from "@/components/cx7/ui";
 import {
   buildAuthorityDraft, compareVersions, createPassportDraft, mergeDivergences, validationErrors,
@@ -21,7 +21,7 @@ export const Route = createFileRoute("/reconciliation")({
   component: Page,
 });
 
-const KEY = "cx7-reconciliation-session";
+
 const emptyV: HumanValidation = {
   validatorName: "", validatorRoleId: "", decisionType: "", validRule: "", validException: "", authorizedRole: "",
   allowedAction: "", premises: "", approvalLimit: "", validityPeriod: "", escalation: "", resolutions: {}, confirmed: false,
@@ -38,7 +38,7 @@ const init: S = {
 
 const inp = "w-full rounded-lg border bg-background/40 px-3 py-2 text-sm outline-none focus:border-gold";
 const Sec = ({ n, t, children }: { n: number; t: string; children: React.ReactNode }) => (
-  <section className="glass mb-6 rounded-2xl p-5 md:p-6">
+  <section className="mb-6 border-b pb-6">
     <p className="eyebrow mb-4">Step {n} · {t}</p>{children}
   </section>
 );
@@ -48,8 +48,6 @@ function Page() {
   const [active, setActive] = useState("r1");
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
-  useEffect(() => { const r = sessionStorage.getItem(KEY); if (r) setS(JSON.parse(r)); }, []);
-  useEffect(() => { sessionStorage.setItem(KEY, JSON.stringify(s)); }, [s]);
   const up = (p: Partial<S>) => setS((x) => ({ ...x, ...p }));
   const upDef = (p: Partial<ProcessDef>) => up({ def: { ...s.def, ...p }, divergences: null, authority: null, passport: null });
   const upV = (p: Partial<HumanValidation>) => up({ v: { ...s.v, ...p }, authority: null, passport: null });
@@ -72,54 +70,52 @@ function Page() {
   return (
     <>
       <PageHeader step="00 · Origin" title="Process Reconciliation" sub="How each role really runs the process — reconciled by a human before it becomes authority.">
-        <Btn onClick={() => { sessionStorage.removeItem(KEY); setS(init); }}>Reset session</Btn>
+        <Btn onClick={() => { setS(init); setActive("r1"); setMsg(null); }}>Reset session</Btn>
       </PageHeader>
-      <p className="mb-6 text-xs text-muted-foreground">Session only: content stays in this browser tab and is never sent on-chain.</p>
+      <p className="mb-6 text-xs text-muted-foreground">Session only · Unsaved · Validator authorization unavailable</p>
 
       <Sec n={1} t="Define the process">
         <div className="grid gap-3 md:grid-cols-2">
-          <input className={inp} placeholder="Process name" value={s.def.name} onChange={(e) => upDef({ name: e.target.value })} />
-          <input className={inp} placeholder="Current known policy (optional)" value={s.def.policy} onChange={(e) => upDef({ policy: e.target.value })} />
+          <input className={inp} aria-label="Process field" placeholder="Process name" value={s.def.name} onChange={(e) => upDef({ name: e.target.value })} />
+          <input className={inp} aria-label="Process field" placeholder="Current known policy (optional)" value={s.def.policy} onChange={(e) => upDef({ policy: e.target.value })} />
         </div>
         <div className="mt-4 space-y-2">
           {s.def.roles.map((r, i) => (
             <div key={r.id} className="flex flex-wrap items-center gap-3">
               <input className={`${inp} max-w-xs`} placeholder={`Role / person ${i + 1}`} value={r.label}
                 onChange={(e) => upDef({ roles: s.def.roles.map((x) => x.id === r.id ? { ...x, label: e.target.value } : x) })} />
-              <label className="flex items-center gap-2 text-xs text-muted-foreground">
-                <input type="checkbox" checked={r.isValidator} onChange={(e) => upDef({ roles: s.def.roles.map((x) => x.id === r.id ? { ...x, isValidator: e.target.checked } : x) })} />
-                Authorized validator
-              </label>
+
             </div>
           ))}
-          <button className="text-sm text-gold hover:underline" onClick={() => upDef({ roles: [...s.def.roles, { id: `r${Date.now()}`, label: "", isValidator: false }] })}>+ Add role</button>
+          <Btn onClick={() => upDef({ roles: [...s.def.roles, { id: `r${Date.now()}`, label: "", isValidator: false }] })}>+ Add role</Btn>
         </div>
       </Sec>
 
       <Sec n={2} t="Capture independent versions">
         <div className="mb-3 flex flex-wrap gap-2">
           {roles.map((r) => (
-            <button key={r.id} onClick={() => setActive(r.id)} className={`rounded-full border px-3 py-1 text-xs ${active === r.id ? "border-gold text-gold" : "text-muted-foreground"}`}>
+            <Btn key={r.id} onClick={() => setActive(r.id)}>
               {r.label}{sealed(r.id) ? " · sealed" : ""}
-            </button>
+            </Btn>
           ))}
         </div>
         {roles.some((r) => r.id === active) && (sealed(active) ? (
-          <p className="text-sm text-muted-foreground">Version sealed at {sealed(active)!.sealedAt}. Hidden from other participants until comparison.</p>
+          <p className="text-sm text-muted-foreground">Version sealed at {sealed(active)?.sealedAt}. Stored separately in this session; participant identity is not verified.</p>
         ) : (
           <div className="space-y-3">
             <textarea className={`${inp} min-h-28`} placeholder="Describe the process from first step to last, as you actually do it."
               value={s.drafts[active] ?? ""} onChange={(e) => up({ drafts: { ...s.drafts, [active]: e.target.value } })} />
             <Btn disabled={!s.drafts[active]?.trim()} onClick={() => {
               const { [active]: text, ...rest } = s.drafts;
-              up({ drafts: rest, versions: [...s.versions, { roleId: active, text: text!, sealedAt: new Date().toISOString() }], divergences: null });
+              if (!text?.trim() || sealed(active)) return;
+              up({ drafts: rest, versions: [...s.versions, { roleId: active, text, sealedAt: new Date().toISOString() }], divergences: null });
             }}>Seal this version</Btn>
           </div>
         ))}
       </Sec>
 
       <Sec n={3} t="Compare">
-        <Btn variant="gold" disabled={busy || s.versions.length < 2} onClick={compare}>{busy ? "Analyzing…" : "Compare versions"}</Btn>
+        <Btn variant="gold" disabled={busy || s.versions.length < 2 || !s.def.name.trim()} onClick={compare}>{busy ? "Analyzing…" : "Compare versions"}</Btn>
         <span className="ml-3 text-xs text-muted-foreground">{s.versions.length} sealed version(s) · minimum 2</span>
         {msg && <p className="mt-3 text-sm text-warning">{msg}</p>}
         {s.agreements.length > 0 && s.divergences && (
@@ -132,7 +128,7 @@ function Page() {
           {s.divergences.length === 0 ? <p className="text-sm text-muted-foreground">No divergences detected.</p> : (
             <div className="space-y-4">
               {s.divergences.map((d) => (
-                <div key={d.id} className="rounded-xl border p-4">
+                <div key={d.id} className="border-b py-4">
                   <div className="mb-2 flex flex-wrap items-center gap-2">
                     <span className="font-semibold">{d.topic}</span><Status value="PENDING REVIEW" />
                     <span className="font-mono text-[10px] uppercase text-muted-foreground">{d.origin === "ai" ? "AI-detected" : "rule-detected"}</span>
@@ -159,7 +155,7 @@ function Page() {
       {s.divergences && (
         <Sec n={5} t="Human validation">
           <div className="grid gap-3 md:grid-cols-2">
-            <input className={inp} placeholder="Validator name" value={s.v.validatorName} onChange={(e) => upV({ validatorName: e.target.value })} />
+            <input className={inp} aria-label="Process field" placeholder="Validator name" value={s.v.validatorName} onChange={(e) => upV({ validatorName: e.target.value })} />
             <select className={inp} value={s.v.validatorRoleId} onChange={(e) => upV({ validatorRoleId: e.target.value })}>
               <option value="">Validator role…</option>
               {roles.map((r) => <option key={r.id} value={r.id}>{r.label}{r.isValidator ? "" : " (not authorized)"}</option>)}
@@ -172,10 +168,10 @@ function Page() {
           </div>
           <label className="mt-4 flex items-start gap-2 text-sm">
             <input type="checkbox" className="mt-1" checked={s.v.confirmed} onChange={(e) => upV({ confirmed: e.target.checked })} />
-            I confirm these rules as governed authority. CX7 did not choose between versions.
+            I have reviewed every proposed resolution. Authority remains unvalidated until a verified validator confirms it.
           </label>
           {errs.length > 0 && <ul className="mt-3 list-disc pl-5 text-xs text-warning">{errs.map((e) => <li key={e}>{e}</li>)}</ul>}
-          <div className="mt-4"><Btn variant="gold" disabled={errs.length > 0} onClick={() => up({ authority: buildAuthorityDraft(s.def, s.versions, s.divergences!, s.v) })}>Validate</Btn></div>
+          <div className="mt-4"><Btn variant="gold" disabled={errs.length > 0} onClick={() => { if (!s.divergences) return; up({ authority: buildAuthorityDraft(s.def, s.versions, s.divergences, s.v) }); }}>Validate</Btn></div>
         </Sec>
       )}
 
@@ -183,11 +179,11 @@ function Page() {
         <Sec n={6} t="Governed output — Reconciled Authority Draft">
           <pre className="overflow-x-auto rounded-lg border bg-background/40 p-4 font-mono text-xs">{JSON.stringify(s.authority, null, 2)}</pre>
           <div className="mt-4 flex flex-wrap items-center gap-3">
-            <Btn variant="gold" onClick={async () => up({ passport: await createPassportDraft(s.authority!) })}>Create Decision Passport Draft</Btn>
+            <Btn variant="gold" onClick={async () => { if (!s.authority) return; up({ passport: await createPassportDraft(s.authority) }); }}>Create Decision Passport Draft</Btn>
             <span className="text-xs text-muted-foreground">Creates a DRAFT only. Nothing is issued on-chain; existing issuance controls still apply.</span>
           </div>
           {s.passport && (
-            <div className="mt-4 rounded-xl border border-gold/30 p-4">
+            <div className="mt-4 border-t border-gold/30 pt-4">
               <div className="mb-2 flex items-center gap-2"><Status value="PENDING" /><span className="font-mono text-xs">DRAFT · off-chain · hash {s.passport.draft_hash.slice(0, 16)}…</span></div>
               <pre className="overflow-x-auto font-mono text-xs">{JSON.stringify(s.passport.record, null, 2)}</pre>
             </div>
