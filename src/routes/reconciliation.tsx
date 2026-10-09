@@ -94,7 +94,9 @@ function Page() {
       <Sec n={2} t="Capture independent versions">
         <div className="mb-3 flex flex-wrap gap-2">
           {roles.map((r) => (
-            <Btn key={r.id} onClick={() => setActive(r.id)}>
+            <Btn key={r.id} type="button" pressed={active === r.id}
+              className={`min-h-11 min-w-11 touch-manipulation ${active === r.id ? "border-gold bg-gold/10 text-gold ring-1 ring-gold/40" : ""}`}
+              onClick={() => setActive(r.id)}>
               {r.label}{sealed(r.id) ? " · sealed" : ""}
             </Btn>
           ))}
@@ -103,7 +105,7 @@ function Page() {
           <p className="text-sm text-muted-foreground">Version sealed at {sealed(active)?.sealedAt}. Stored separately in this session; participant identity is not verified.</p>
         ) : (
           <div className="space-y-3">
-            <textarea className={`${inp} min-h-28`} placeholder="Describe the process from first step to last, as you actually do it."
+            <textarea key={active} aria-label={`Process version — ${roles.find((r) => r.id === active)?.label ?? ""}`} className={`${inp} min-h-28`} placeholder="Describe the process from first step to last, as you actually do it."
               value={s.drafts[active] ?? ""} onChange={(e) => up({ drafts: { ...s.drafts, [active]: e.target.value } })} />
             <Btn disabled={!s.drafts[active]?.trim()} onClick={() => {
               const { [active]: text, ...rest } = s.drafts;

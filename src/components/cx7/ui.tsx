@@ -29,15 +29,16 @@ export function Status({ value }: { value: string }) {
   );
 }
 
-export function Btn({ children, variant = "ghost", onClick, to, disabled }: { children: ReactNode; variant?: "gold" | "ghost"; onClick?: () => void; to?: string; disabled?: boolean }) {
+export function Btn({ children, variant = "ghost", onClick, to, disabled, className, pressed, type }: { children: ReactNode; variant?: "gold" | "ghost"; onClick?: () => void; to?: string; disabled?: boolean; className?: string; pressed?: boolean; type?: "button" | "submit" | "reset" }) {
   const cls = cn(
     "inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-all disabled:opacity-40",
     variant === "gold"
       ? "bg-gold-gradient text-primary-foreground hover:brightness-110 shadow-[var(--shadow-glow)]"
       : "border border-gold/30 text-gold-soft hover:border-gold hover:bg-gold/10",
+    className,
   );
   if (to) return <Link to={to} className={cls}>{children}</Link>;
-  return <button className={cls} onClick={onClick} disabled={disabled}>{children}</button>;
+  return <button type={type} className={cls} onClick={onClick} disabled={disabled} aria-pressed={pressed}>{children}</button>;
 }
 
 export function PageHeader({ step, title, sub, children }: { step: string; title: string; sub: string; children?: ReactNode }) {
