@@ -12,7 +12,7 @@ export function V5Proof({ initial }: { initial: V5Result }) {
   const read = useServerFn(readV5Evidence);
   const result = fresh ?? initial;
   const data = result.ok ? result.data : null;
-  const refresh = async () => { setBusy(true); try { setFresh(await read()); } catch { setFresh({ ok: false, error: "UNAVAILABLE — Devnet read failed. No transaction was executed." }); } finally { setBusy(false); } };
+  const refresh = async () => { setBusy(true); try { setFresh(await read()); } catch { setFresh({ ok: false, error: "UNAVAILABLE — the Devnet proof could not be independently read and verified. No transaction was executed." }); } finally { setBusy(false); } };
   return <>
     <section className="border-t py-9">
       <div className="flex flex-wrap items-center justify-between gap-4"><h2 className="text-xl text-gold">SOLANA DEVNET PROOF</h2><Btn onClick={() => { void refresh(); }} disabled={busy} className="min-h-11 shadow-none"><RefreshCw size={15} />{busy ? "Reading…" : "Read proof again"}</Btn></div>

@@ -18,7 +18,7 @@ export const V5_AUTHORITY_CHECKS = [
 ] as const;
 
 export function checkV5Payload(p: Record<string, unknown>, expiry: number, now: number) {
-  const bound = p.protocol_version === 1 && p.passport_version === 5 && p.authority === V5.authority && p.valid_until === BigInt(V5.expiry) && expiry === V5.expiry && p.status === "VALID";
-  const match = bound && p.decision_hash === V5.hash;
+  const bound = p["protocol_version"] === 1 && p["passport_version"] === 5 && p["authority"] === V5.authority && p["valid_until"] === BigInt(V5.expiry) && expiry === V5.expiry && p["status"] === "VALID";
+  const match = bound && p["decision_hash"] === V5.hash;
   return { match, snapshotStatus: match ? "VALID" : "UNVERIFIED", timeStatus: match ? (now >= expiry ? "EXPIRED" : "WITHIN RECORDED VALIDITY") : "UNVERIFIED" };
 }

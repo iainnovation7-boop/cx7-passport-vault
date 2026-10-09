@@ -1,4 +1,4 @@
-import { address, createSolanaRpc } from "@solana/kit";
+import { address, createSolanaRpc, signature } from "@solana/kit";
 import { deserializeAttestationData, fetchMaybeAttestation, fetchMaybeCredential, fetchMaybeSchema, SOLANA_ATTESTATION_SERVICE_PROGRAM_ADDRESS } from "sas-lib";
 import { checkV5Payload, V5 } from "./hackathon-v5";
 
@@ -12,15 +12,15 @@ export async function readHackathonV5() {
     fetchMaybeAttestation(rpc, address(V5.attestation), { commitment: "finalized" }),
     fetchMaybeSchema(rpc, address(V5.schema), { commitment: "finalized" }),
     fetchMaybeCredential(rpc, address(V5.credential), { commitment: "finalized" }),
-    rpc.getSignatureStatuses([V5.transaction], { searchTransactionHistory: true }).send(),
-    rpc.getTransaction(V5.transaction, { commitment: "finalized", maxSupportedTransactionVersion: 0 }).send(),
+    rpc.getSignatureStatuses([signature(V5.transaction)], { searchTransactionHistory: true }).send(),
+    rpc.getTransaction(signature(V5.transaction), { commitment: "finalized", maxSupportedTransactionVersion: 0 }).send(),
   ]);
   if (!a.exists || !s.exists || !c.exists || !tx || tx.meta?.err !== null || statuses.value[0]?.confirmationStatus !== "finalized" || statuses.value[0]?.err !== null) throw new Error("Unverified references");
   if ([a, s, c].some(account => account.programAddress !== SOLANA_ATTESTATION_SERVICE_PROGRAM_ADDRESS) || a.data.credential !== V5.credential || a.data.schema !== V5.schema || a.data.signer !== V5.authority || s.data.credential !== V5.credential || c.data.authority !== V5.authority || !c.data.authorizedSigners.includes(address(V5.authority)) || new TextDecoder().decode(Uint8Array.from(s.data.name)) !== "CX7_DECISION_PASSPORT_V2") throw new Error("Unverified binding");
   const keys = tx.transaction.message.accountKeys;
-  if (![V5.attestation, V5.authority, V5.credential, V5.schema, SOLANA_ATTESTATION_SERVICE_PROGRAM_ADDRESS].every(key => keys.some(k => k === key))) throw new Error("Unrelated transaction");
+  if (![V5.attestation, V5.authority, V5.credential, V5.schema, SOLANA_ATTESTATION_SERVICE_PROGRAM_ADDRESS].every(key => keys.some(k => String(k) === key))) throw new Error("Unrelated transaction");
   const p = deserializeAttestationData<Record<string, unknown>>(s.data, Uint8Array.from(a.data.data));
   const checks = checkV5Payload(p, Number(a.data.expiry), Math.floor(Date.now() / 1000));
   // Only publish allowlisted evidence metadata, never the raw payload or pseudonymous internal IDs.
-  return { ...checks, hash: typeof p.decision_hash === "string" ? p.decision_hash : null, transactionStatus: "FINALIZED", readAt: new Date().toISOString(), validUntil: new Date(Number(a.data.expiry) * 1000).toISOString() };
+  return { ...checks, hash: typeof p["decision_hash"] === "string" ? p["decision_hash"] : null, transactionStatus: "FINALIZED", readAt: new Date().toISOString(), validUntil: new Date(Number(a.data.expiry) * 1000).toISOString() };
 }
