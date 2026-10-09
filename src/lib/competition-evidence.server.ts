@@ -5,6 +5,7 @@ import { verifyPassportVersion } from "./passport-verify.server";
 import { type V2Payload } from "./schema-v2";
 import { readSolUsdPremise } from "./pyth-premise.server";
 import { address } from "@solana/kit";
+import { referencePayloadMatches, referenceStatus } from "./reference-verification";
 
 /** Independent, read-only reference evidence. No historical issuance or revocation functions are called. */
 export async function readCompetitionEvidence() {
@@ -16,13 +17,11 @@ export async function readCompetitionEvidence() {
   let successorVerified = false;
   if (acc2.exists && schema.exists && (two.status === "VALID" || two.status === "EXPIRED")) {
     const p = deserializeAttestationData<V2Payload>(schema.data, Uint8Array.from(acc2.data.data));
-    successorVerified = p.previous_version_id === n1Id && p.previous_decision_hash === n1.decision_hash && p.authority === info.authority && Number(p.protocol_version) === 1 && p.status === "VALID" && Number(p.valid_until) === Number(acc2.data.expiry);
+    successorVerified = p.previous_version_id === n1Id && referencePayloadMatches(p, n2, info.authority, Number(acc2.data.expiry));
   }
   const rows = await Promise.all([{ v: n1, r: one }, { v: n2, r: two }].map(async ({ v, r }) => {
     const history = (await rpc.getSignaturesForAddress(address(r.attestation), { limit: 50, commitment: "confirmed" }).send()).filter(s => !s.err);
-    let status: string = r.status;
-    if (v.version === 1 && !acc1.exists) status = successorVerified ? "REVOKED" : "UNAVAILABLE";
-    if (v.version === 2 && !successorVerified) status = "VERIFICATION FAILED";
+    const status = referenceStatus(v.version === 1 ? acc1.exists : acc2.exists, v.version, r.status, successorVerified);
     const signature = history.at(-1)?.signature ?? null;
     return { version: v.version, attestation: r.attestation, status, decisionHash: v.decision_hash, previousVersionId: v.previous_version_id, signature, explorerUrl: signature ? `https://explorer.solana.com/tx/${signature}?cluster=devnet` : null, accountUrl: `https://explorer.solana.com/address/${r.attestation}?cluster=devnet`, issuedAt: r.issuedAt, validUntil: r.validUntil, revocationEvidence: v.version === 1 && status === "REVOKED" ? two.attestation : null };
   }));
