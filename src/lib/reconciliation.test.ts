@@ -45,14 +45,23 @@ describe("process reconciliation", () => {
     expect(c.divergences.length).toBeGreaterThanOrEqual(4);
     expect(c.divergences.every((x) => x.status === "UNRESOLVED")).toBe(true);
   });
-  it("5. human validation is mandatory and only by an authorized validator", () => {
-    expect(() => buildAuthorityDraft(def, versions, c.divergences, validation)).toThrow(/Human validation/);
-    expect(validationErrors(def, c.divergences, { ...resolved(), validatorRoleId: "sales" })).toContain("Role “Sales coordinator” is not authorized to validate.");
+  it("5. requires every human resolution and explicit current-session confirmation", async () => {
+    await expect(buildAuthorityDraft(def, versions, c.divergences, validation)).rejects.toThrow(/Human validation/);
     expect(validationErrors(def, c.divergences, { ...resolved(), confirmed: false })).toContain("Explicit confirmation is required.");
-    expect(validationErrors(def, c.divergences, resolved())).toContain("Verified validator authorization is unavailable in session-only mode.");
+    expect(validationErrors(def, c.divergences, { ...resolved(), validatorRoleId: "sales" })).toEqual([]);
+    const draft = await buildAuthorityDraft(def, versions, c.divergences, resolved());
+    expect(draft.confirmation_scope).toBe("CURRENT_SESSION_UNAUTHENTICATED");
   });
-  it("6. refuses draft creation without verified authorization", async () => {
-    await expect(createPassportDraft({} as Parameters<typeof createPassportDraft>[0])).rejects.toThrow("Verified validator authorization");
+  it("6. creates only a real session-derived off-chain draft", async () => {
+    const authority = await buildAuthorityDraft(def, versions, c.divergences, resolved());
+    const draft = await createPassportDraft(authority);
+    expect(draft.status).toBe("DRAFT");
+    expect(draft.onchain).toBe(false);
+    expect(draft.record.limits).toBe("5%");
+    expect(draft.record.authorized_role).toBe("Manager");
+    expect(draft.record.source_evidence_hashes).toHaveLength(2);
+    expect(draft.record.passport_id).toMatch(/^CX7-[a-f0-9]{64}$/);
+    expect(draft.record.predecessor_id).toBeNull();
   });
   it("7. keeps independent versions unchanged during comparison", () => {
     const snapshot = structuredClone(versions);
