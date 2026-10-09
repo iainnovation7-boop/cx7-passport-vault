@@ -15,6 +15,7 @@ import { Route as GateRouteImport } from './routes/gate'
 import { Route as PassportsRouteImport } from './routes/passports'
 import { Route as PlatformsRouteImport } from './routes/platforms'
 import { Route as ProofsRouteImport } from './routes/proofs'
+import { Route as ReconciliationRouteImport } from './routes/reconciliation'
 import { Route as TimelineRouteImport } from './routes/timeline'
 
 const IndexRoute = IndexRouteImport.update({
@@ -47,6 +48,11 @@ const ProofsRoute = ProofsRouteImport.update({
   path: '/proofs',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ReconciliationRoute = ReconciliationRouteImport.update({
+  id: '/reconciliation',
+  path: '/reconciliation',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TimelineRoute = TimelineRouteImport.update({
   id: '/timeline',
   path: '/timeline',
@@ -60,6 +66,7 @@ export interface FileRoutesByFullPath {
   '/passports': typeof PassportsRoute
   '/platforms': typeof PlatformsRoute
   '/proofs': typeof ProofsRoute
+  '/reconciliation': typeof ReconciliationRoute
   '/timeline': typeof TimelineRoute
 }
 export interface FileRoutesByTo {
@@ -69,6 +76,7 @@ export interface FileRoutesByTo {
   '/passports': typeof PassportsRoute
   '/platforms': typeof PlatformsRoute
   '/proofs': typeof ProofsRoute
+  '/reconciliation': typeof ReconciliationRoute
   '/timeline': typeof TimelineRoute
 }
 export interface FileRoutesById {
@@ -79,6 +87,7 @@ export interface FileRoutesById {
   '/passports': typeof PassportsRoute
   '/platforms': typeof PlatformsRoute
   '/proofs': typeof ProofsRoute
+  '/reconciliation': typeof ReconciliationRoute
   '/timeline': typeof TimelineRoute
 }
 export interface FileRouteTypes {
@@ -90,6 +99,7 @@ export interface FileRouteTypes {
     | '/passports'
     | '/platforms'
     | '/proofs'
+    | '/reconciliation'
     | '/timeline'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -99,6 +109,7 @@ export interface FileRouteTypes {
     | '/passports'
     | '/platforms'
     | '/proofs'
+    | '/reconciliation'
     | '/timeline'
   id:
     | '__root__'
@@ -108,6 +119,7 @@ export interface FileRouteTypes {
     | '/passports'
     | '/platforms'
     | '/proofs'
+    | '/reconciliation'
     | '/timeline'
   fileRoutesById: FileRoutesById
 }
@@ -118,6 +130,7 @@ export interface RootRouteChildren {
   PassportsRoute: typeof PassportsRoute
   PlatformsRoute: typeof PlatformsRoute
   ProofsRoute: typeof ProofsRoute
+  ReconciliationRoute: typeof ReconciliationRoute
   TimelineRoute: typeof TimelineRoute
 }
 
@@ -165,6 +178,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProofsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reconciliation': {
+      id: '/reconciliation'
+      path: '/reconciliation'
+      fullPath: '/reconciliation'
+      preLoaderRoute: typeof ReconciliationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/timeline': {
       id: '/timeline'
       path: '/timeline'
@@ -182,6 +202,7 @@ const rootRouteChildren: RootRouteChildren = {
   PassportsRoute: PassportsRoute,
   PlatformsRoute: PlatformsRoute,
   ProofsRoute: ProofsRoute,
+  ReconciliationRoute: ReconciliationRoute,
   TimelineRoute: TimelineRoute,
 }
 export const routeTree = rootRouteImport
