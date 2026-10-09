@@ -1,4 +1,10 @@
-# Process Reconciliation
+# Competition restructuring
+
+- [ ] Remove mock public experiences and claims; expose reconciliation and real evidence only.
+- [ ] Enable explicit current-session human resolution and content-derived hashed Passport Draft.
+- [ ] Assess safe dynamic SAS issuance; retain publicly only if safely proven with real read-back, at most one new test issuance.
+- [ ] Verify real historical lifecycle and independent Pyth reads, English UI, mobile and desktop.
+- [ ] Run tests, inspect automatic build, publish only when retained capabilities meet criteria, and report evidence and limitations.
 
 - [x] Audit English public copy, existing action connections and date/status presentation; 56/56 tests and build OK; desktop/mobile 390×844 checks passed without transactions or publication. Catalogue issuance/review and platform connection remain unavailable; no real flow exists for illustrative records.
 
@@ -8,7 +14,6 @@
 
 - [x] Verify participant selection, independent drafts and two sealed versions on mobile 390×844 and desktop, without publication (41/41 tests; build OK).
 
-- [ ] AI comparison: blocked until Lovable Cloud is authorized for secure server-side AI access.
-- [ ] Verified validator and governed passport draft: blocked until real sign-in and validator authorization are available.
+- External AI and enterprise validator identity are excluded from competition scope.
 - [x] Complete session-only capture, deterministic review and fail-closed validation checks.
 - [x] Run existing and new tests and inspect desktop/mobile preview without Solana transactions or publication (39/39; build OK).
