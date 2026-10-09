@@ -48,6 +48,73 @@ export const homePanels = {
   }
 } as const;
 
+export type HomeLanguage = "en" | "pt-BR";
+
+const portuguesePanels = {
+  platform: {
+    kicker: '01 · Sua plataforma',
+    title: 'Reconciliação da política de descontos.',
+    subtitle: 'Versões independentes · revisão humana',
+    metrics: [
+      ['Caso', 'Política de descontos'],
+      ['Fonte de autoridade', 'CX7 Decision Passport v5'],
+      ['Revisão', 'Governada por pessoas'],
+      ['Conteúdo sensível', 'Fora da blockchain'],
+    ],
+    note: 'O CX7 reconcilia o entendimento dos processos e representa a autoridade de decisão governada por pessoas. A Solana registra a integridade da prova; não decide se as regras de negócio estão corretas.',
+  },
+  passport: {
+    kicker: '02 · Passaporte de decisão',
+    title: 'Autoridade que expira quando a realidade muda.',
+    subtitle: 'Limitada pelo tempo · pelas premissas · governada por pessoas',
+    metrics: [
+      ['Passaporte', `${homeV5.passport} · ${homeV5.status}`],
+      ['Válido até', homeV5.validUntil],
+      ['Versão anterior', `${homeV5.predecessor} · ${homeV5.predecessorStatus}`],
+      ['Autoridade', 'Governada por pessoas'],
+    ],
+    note: 'Registro do caso v5, não uma nova consulta de validade em tempo real. A permissão expira quando a realidade muda.',
+  },
+  gate: {
+    kicker: '03 · Controle de execução',
+    title: 'Autoridade / Execução.',
+    subtitle: 'Resultados registrados do caso v5',
+    metrics: homeV5.outcomes.map(({ percent, exception, result }) => [
+      `${percent}%${exception ? ' · exceção válida' : ''}`, result,
+    ]),
+    note: 'O resultado de 10% exige uma exceção válida para um cliente com mais de cinco anos de histórico. Estes são resultados registrados do caso, não uma nova execução nem um controle simulado.',
+  },
+  proof: {
+    kicker: '04 · Prova Solana',
+    title: 'Prova verificável sem expor dados empresariais.',
+    subtitle: 'Camada externa de integridade',
+    metrics: [
+      ['Rede', 'Solana Devnet'],
+      ['Estado da transação', homeV5.transactionStatus],
+      ['Leitura de confirmação', homeV5.readBack],
+      ['Dados sensíveis', 'Nunca na blockchain'],
+    ],
+    note: 'Evidência v5 registrada anteriormente, não uma nova verificação em tempo real. A Solana ancora a prova criptográfica; não avalia regras de desconto nem valida sua correção empresarial. O conteúdo sensível dos processos permanece fora da blockchain.',
+  },
+} as const;
+
+export const homeLanguages = {
+  en: {
+    panels: homePanels,
+    start: 'START', close: 'Close', open: 'Open', navigation: 'Home navigation',
+    reconciliation: 'Reconciliation', language: 'Language', explorer: 'open Solana Explorer',
+    imageAlt: 'IA Innovation — CX7 Decision Passport — Governed authority for autonomous systems',
+    proofLabels: ['Evidence hash', 'Transaction', 'Attestation', 'Authority', 'Credential', 'Schema'],
+  },
+  'pt-BR': {
+    panels: portuguesePanels,
+    start: 'COMEÇAR', close: 'Fechar', open: 'Abrir', navigation: 'Navegação da Home',
+    reconciliation: 'Reconciliação', language: 'Idioma', explorer: 'abrir Solana Explorer',
+    imageAlt: 'IA Innovation — CX7 Decision Passport — Autoridade governada para sistemas autônomos',
+    proofLabels: ['Hash da evidência', 'Transação', 'Atestação', 'Autoridade', 'Credencial', 'Schema'],
+  },
+} as const;
+
 export const scenarioEvents = [
   ["14:07", "Premise Changed", "PREMISE CHANGED"],
   ["14:07:03", "Execution Blocked", "EXECUTION BLOCKED"],

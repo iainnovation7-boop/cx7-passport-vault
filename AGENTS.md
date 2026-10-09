@@ -19,3 +19,4 @@
 - Static passport catalogue expiration is presentation-only and isolated from authority/verification modules; unavailable catalogue operations stay disabled because illustrative IDs are not on-chain issuance targets.
 - Restored Home evidence is isolated in a presentation-only module and displayed through existing dialogs; supplied historical statuses never trigger RPC, issuance or live-verification claims, preserving all authority modules.
 - Home START traverses the four existing evidence dialogs in order, never the separate transactional LiveScenario; this keeps the v5 experience presentation-only.
+- Home localization uses a presentation-only dictionary and a local language preference, with identical evidence values in both languages; this preserves the approved dialogs and prevents localization from reaching authority or transaction modules.
