@@ -17,7 +17,7 @@ function setup() {
 describe("reconciliation participant interaction", () => {
   it("requires session confirmation before creating a content-derived Draft without an issuance action", async () => {
     setup();
-    for (const [role,text] of [["C", "The coordinator approves up to 10% through WhatsApp."], ["S", "Above 5% requires manager approval in the formal system."]]) {
+    for (const [role,text] of [["C", "The coordinator approves up to 10% through WhatsApp."], ["S", "Above 5% requires manager approval in the formal system."]] as const) {
       fireEvent.click(screen.getByRole("button", { name: role }));
       fireEvent.change(screen.getByRole("textbox", { name: `Process version — ${role}` }), { target: { value: text } });
       fireEvent.click(screen.getByRole("button", { name: "Seal this version" }));

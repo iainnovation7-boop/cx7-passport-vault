@@ -1,4 +1,5 @@
-import { expect, it } from "vitest";
+import { expect, it, vi } from "vitest";
+vi.mock("@tanstack/react-start", () => ({ createServerFn: () => ({ handler: (fn: () => unknown) => fn }) }));
 import { issueVerifiableProof, revokePassportN1 } from "./solana-proof.functions";
 it("public historical issuance fails closed without calling a signing path", async () => {
   const r = await issueVerifiableProof();
