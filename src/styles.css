@@ -86,7 +86,7 @@
       radial-gradient(ellipse 50% 40% at 90% 20%, oklch(0.6 0.14 152 / 6%), transparent 60%);
     background-attachment: fixed;
   }
-  h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.02em; }
+  h1, h2, h3 { font-family: var(--font-display); letter-spacing: 0; }
 }
 
 @utility glass {

@@ -81,11 +81,8 @@ function RootShell({ children }: { children: ReactNode }) {
 
 const nav = [
   { to: "/reconciliation", label: "Reconciliation" },
-  { to: "/platforms", label: "Platforms" },
-  { to: "/passports", label: "Passports" },
-  { to: "/gate", label: "Gate" },
-  { to: "/proofs", label: "Proofs" },
-  { to: "/timeline", label: "Timeline" },
+  { to: "/evidence", label: "Evidence" },
+  { to: "/premise", label: "Pyth" },
 ] as const;
 
 function RootComponent() {
@@ -106,7 +103,6 @@ function RootComponent() {
                   {n.label}
                 </Link>
               ))}
-              <Link to="/demo" className="ml-2 whitespace-nowrap rounded-full border border-cyan/40 px-3 py-1.5 text-cyan transition-colors hover:bg-cyan/10">Live demo</Link>
             </nav>
           </div>
         </header>
@@ -115,7 +111,7 @@ function RootComponent() {
         </div>
         <footer className={isHome ? "hidden" : "mx-auto max-w-7xl px-5 pb-10"}>
           <div className="hairline mb-6" />
-          <p className="eyebrow text-center">AI permissions expire when reality changes</p>
+          <p className="eyebrow text-center">Permission expires when reality changes.</p>
         </footer>
       </div>
     </QueryClientProvider>

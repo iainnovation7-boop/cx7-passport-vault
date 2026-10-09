@@ -9,11 +9,15 @@
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
 
-- Keep the approved image-based Home in a dedicated React component with scoped CSS and local dialog state; this preserves the supplied composition without changing data or existing routes.
+- Keep competition Home in a dedicated component using the existing visual identity and only working links; historical image-embedded mock modules must not appear public.
 - The root always renders Outlet and only hides shared navigation and footer on Home; other pages retain their existing layout.
 - Solana proofs use the Solana Attestation Service (sas-lib + @solana/kit 5.x, Devnet only) inside a createServerFn; keys stay in project secrets and the Devnet authority keypair is derived deterministically from SOLANA_AUTHORITY_SECRET_KEY so it never changes or leaves the server.
 - Passport authority is versioned (lineage + version + decision_hash → id/nonce); revoked/superseded versions are never reissued, and "REVOKED" requires on-chain evidence (create+close history or a verified successor), never mere absence — so state can't be faked by a missing account.
 - External premises are read from the Pyth SOL/USD PriceUpdateV2 account on Solana Devnet (read-only RPC); stale or partially verified prices never evaluate TRUE — the public Hermes HTTP API now requires auth.
 - On-chain proofs use schema CX7_DECISION_PASSPORT_V2 only (V1 kept for read compatibility, never created); issuance goes n1 → (n1 revoked on-chain) → n2, and the UI shows VERIFIED/VALID ON-CHAIN only through the onchain-display guards so no on-chain status can be shown without a real read.
-- Process Reconciliation is isolated from issuance modules and uses volatile page state; fail closed on governed output until server-verified validator authorization exists, because browser-declared roles are not a security boundary.
-- Static passport catalogue expiration is presentation-only and isolated from authority/verification modules; unavailable catalogue operations stay disabled because illustrative IDs are not on-chain issuance targets.
+- Reconciliation uses volatile page state and deterministic comparison; session human confirmation produces only an off-chain content-derived draft, never authenticated enterprise authority.
+- Historical catalogue routes redirect to retained capabilities; no mock catalogues or disabled product promises are public.
+
+- Public issuance and revocation wrappers fail closed; no signing endpoint may spend the authority balance without verified issuer authorization and abuse controls.
+- Competition evidence reads are isolated from historical writers and validate Devnet genesis and successor references; absence alone cannot establish revocation.
+- Draft hashing uses Web Crypto canonical JSON and an allowlisted commitment; raw business content stays in session memory.
