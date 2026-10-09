@@ -80,7 +80,7 @@ function RootShell({ children }: { children: ReactNode }) {
 }
 
 const nav = [
-  { to: "/reconciliation", label: "Reconciliação" },
+  { to: "/reconciliation", label: "Reconciliation" },
   { to: "/platforms", label: "Platforms" },
   { to: "/passports", label: "Passports" },
   { to: "/gate", label: "Gate" },
