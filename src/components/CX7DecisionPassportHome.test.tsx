@@ -5,7 +5,7 @@ import CX7DecisionPassportHome from "./CX7DecisionPassportHome";
 vi.mock("@tanstack/react-router", () => ({ Link: ({ children }: { children: React.ReactNode }) => <a>{children}</a> }));
 
 beforeEach(() => {
-  HTMLDialogElement.prototype.showModal = vi.fn();
+  HTMLDialogElement.prototype.showModal = vi.fn(function (this: HTMLDialogElement) { this.setAttribute("open", ""); });
   HTMLDialogElement.prototype.close = vi.fn();
   HTMLDialogElement.prototype.scrollTo = vi.fn();
 });
@@ -24,7 +24,9 @@ describe("START v5 experience", () => {
     fireEvent.click(screen.getByRole("button", { name: "Solana Proof →" }));
     expect(screen.getByText("FINALIZED")).toBeInTheDocument();
     expect(screen.getByText("MATCH")).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Close", exact: true }).closest("dialog")?.querySelector(".cx7-ready-cta") ?? screen.getAllByRole("button", { name: "Close" })[1]);
+    const closeButton = screen.getAllByRole("button", { name: "Close" }).at(-1);
+    if (!closeButton) throw new Error("Final module must have a close control");
+    fireEvent.click(closeButton);
     expect(HTMLDialogElement.prototype.close).toHaveBeenCalledOnce();
   });
 });
