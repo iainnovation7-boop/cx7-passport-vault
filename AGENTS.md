@@ -18,3 +18,4 @@
 - Process Reconciliation is isolated from issuance modules and uses volatile page state; fail closed on governed output until server-verified validator authorization exists, because browser-declared roles are not a security boundary.
 - Static passport catalogue expiration is presentation-only and isolated from authority/verification modules; unavailable catalogue operations stay disabled because illustrative IDs are not on-chain issuance targets.
 - Restored Home evidence is isolated in a presentation-only module and displayed through existing dialogs; supplied historical statuses never trigger RPC, issuance or live-verification claims, preserving all authority modules.
+- Home START traverses the four existing evidence dialogs in order, never the separate transactional LiveScenario; this keeps the v5 experience presentation-only.

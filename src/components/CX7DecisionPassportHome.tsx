@@ -4,20 +4,20 @@ import { Button } from "@/components/ui/button";
 import homeArt from "@/assets/cx7-decision-passport-home-green.png";
 import { homePanels } from "@/components/cx7/home-panels";
 import { homeV5ProofDetails } from "@/components/cx7/home-v5";
-import { LiveScenario } from "@/components/cx7/LiveScenario";
 import "./cx7-decision-passport.css";
 
-type Panel = keyof typeof homePanels | "scenario";
+type Panel = keyof typeof homePanels;
+const panelOrder: Panel[] = ["platform", "passport", "gate", "proof"];
 
 export default function CX7DecisionPassportHome() {
   const dialog = useRef<HTMLDialogElement>(null);
-  const [active, setActive] = useState<Panel>("scenario");
-  const [openCount, setOpenCount] = useState(0);
-  const panel = active === "scenario" ? null : homePanels[active];
+  const [active, setActive] = useState<Panel>("platform");
+  const panel = homePanels[active];
+  const nextPanel = panelOrder[panelOrder.indexOf(active) + 1];
   const open = (key: Panel) => {
     setActive(key);
-    setOpenCount((n) => n + 1);
     dialog.current?.showModal();
+    dialog.current?.scrollTo({ top: 0 });
   };
   return (
     <div className="cx7-approved-home relative">
@@ -26,7 +26,7 @@ export default function CX7DecisionPassportHome() {
       </nav>
       <main className="cx7-ready-stage" aria-label="CX7 Decision Passport">
         <img className="cx7-ready-art" src={homeArt} width={1122} height={1402} alt="IA Innovation — CX7 Decision Passport — Governed authority for autonomous systems" />
-        <Button variant="ghost" className="cx7-ready-hotspot cx7-ready-core" aria-label="Open CX7 Decision Passport live scenario" onClick={() => open("scenario")}>
+        <Button variant="ghost" className="cx7-ready-hotspot cx7-ready-core" aria-label="START" onClick={() => open("platform")}>
           <span className="cx7-ready-start" aria-hidden="true">
             <span className="cx7-ready-start-dot" />
             <span className="cx7-ready-start-word">START</span>
@@ -42,7 +42,7 @@ export default function CX7DecisionPassportHome() {
         if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) dialog.current?.close();
       }}>
         <Button variant="ghost" size="icon" className="cx7-ready-close" aria-label="Close" onClick={() => dialog.current?.close()}>×</Button>
-        {panel ? <>
+        <>
           <p className="cx7-ready-kicker">{panel.kicker}</p>
           <h2 id="cx7-panel-title">{panel.title}</h2>
           <p className="cx7-ready-subtitle">{panel.subtitle}</p>
@@ -56,7 +56,10 @@ export default function CX7DecisionPassportHome() {
               </dd>
             </div>)}
           </dl>}
-        </> : <LiveScenario key={openCount} />}
+          <Button variant="ghost" className="cx7-ready-cta" onClick={() => nextPanel ? open(nextPanel) : dialog.current?.close()}>
+            {nextPanel ? `${homePanels[nextPanel].kicker.slice(5)} →` : "Close"}
+          </Button>
+        </>
       </dialog>
     </div>
   );
