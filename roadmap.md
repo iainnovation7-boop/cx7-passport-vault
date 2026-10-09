@@ -4,7 +4,7 @@
 - [x] Enable explicit current-session human resolution and content-derived hashed Passport Draft.
 - [x] Assess safe dynamic SAS issuance; excluded from the public experience because verified issuer authorization and abuse controls are unavailable. Public writers fail closed; no transaction executed.
 - [x] Verify real historical lifecycle and independent Pyth reads, English UI, mobile and desktop; 67 tests pass, automatic build OK, no hydration errors or overflow.
-- [ ] Run tests, inspect automatic build, publish only when retained capabilities meet criteria, and report evidence and limitations.
+- [x] Run tests and inspect automatic build; publish retained evidenced capabilities. Public desktop/mobile capture → confirmation → Draft, evidence/Pyth and legacy redirects verified without page errors, overflow or transactions. Dynamic issuance is excluded, not simulated.
 
 - [x] Audit English public copy, existing action connections and date/status presentation; 56/56 tests and build OK; desktop/mobile 390×844 checks passed without transactions or publication. Catalogue issuance/review and platform connection remain unavailable; no real flow exists for illustrative records.
 
