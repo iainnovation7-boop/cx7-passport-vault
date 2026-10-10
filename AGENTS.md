@@ -20,3 +20,4 @@
 - Restored Home evidence is isolated in a presentation-only module and displayed through existing dialogs; supplied historical statuses never trigger RPC, issuance or live-verification claims, preserving all authority modules.
 - Home START traverses the four existing evidence dialogs in order, never the separate transactional LiveScenario; this keeps the v5 experience presentation-only.
 - Home localization uses a presentation-only dictionary and a local language preference, with identical evidence values in both languages; this preserves the approved dialogs and prevents localization from reaching authority or transaction modules.
+- Derive the institutional favicon from the existing Home emblem without editing the artwork, and manage promotional badge visibility through official publish settings; this isolates branding from application behavior.

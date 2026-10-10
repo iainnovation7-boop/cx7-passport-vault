@@ -1,5 +1,7 @@
 # Process Reconciliation
 
+- [x] Promotional badge hidden through official settings; template favicon replaced with existing institutional emblem, CX7 sharing metadata/image preserved; 70/70 tests and automatic build OK; published Home HTTP 200 verified on desktop/mobile with EN/PT-BR, four modules and unchanged v5 identifiers, without transactions. Basic security check reported no issues; deep analysis remains stale.
+
 - [x] Published originals confirmed English in all four Home dialogs (browser translation remains the likely source of mixed screenshots); EN/PT-BR selection added only to approved Home/dialogs, retaining original bitmap English lettering and official evidence values; both languages pass four-module navigation on mobile 390×844 and desktop 1280×1800, 70 tests pass; preview only, no transactions.
 
 - [x] Adjust only START size/position; verify recorded v4 history, 65/65 tests, four-module navigation on mobile 390×844 and desktop 1280×1800, and automatic build OK; no publication or transactions.
